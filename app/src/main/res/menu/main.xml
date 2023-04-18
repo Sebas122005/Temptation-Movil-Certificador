@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/jmiInicio"
+        android:title="Inicio" />
+    <item
+        android:id="@+id/jmibrand"
+        android:title="Marca" />
+    <item
+        android:id="@+id/jmicolor"
+        android:title="Color" />
+    <item
+        android:id="@+id/jmicategory"
+        android:title="Categoria" />
+    <item
+        android:id="@+id/jmistyle"
+        android:title="Estilo" />
+    <item
+        android:id="@+id/jmiproduct"
+        android:title="Producto" />
+    <item
+        android:id="@+id/jmirol"
+        android:title="Roles" />
+    <item
+        android:id="@+id/jmisize"
+        android:title="Sizes" />
+    <item
+        android:id="@+id/jmiperson"
+        android:title="Usuarios"/>
+    <item
+        android:id="@+id/jmiprovider"
+        android:title="Proveedor" />
+    <item
+        android:id="@+id/jmiincome"
+        android:title="Compra" />
+    <item
+        android:id="@+id/jmidetailincome"
+        android:title="Detalle Compra" />
+    <item
+        android:id="@+id/jmioutput"
+        android:title="Output" />
+</menu>

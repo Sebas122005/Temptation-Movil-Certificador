@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="12dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/lstidincome"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="30dp"
+            android:fontFamily="serif"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="15sp"
+            android:text="lstcodincome" />
+
+        <TextView
+            android:id="@+id/lstnomproviders"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="30dp"
+            android:fontFamily="serif"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="15sp"
+            android:text="lstnombreprovides" />
+
+        <TextView
+            android:id="@+id/lstfechaincome"
+            android:layout_width="0dp"
+            android:layout_weight="1.4"
+            android:layout_height="30dp"
+            android:fontFamily="serif"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="15sp"
+            android:text="lstfechaincome" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

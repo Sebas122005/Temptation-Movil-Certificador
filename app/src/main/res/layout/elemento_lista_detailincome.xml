@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="12dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/lstiddetailincomeE"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="30dp"
+            android:fontFamily="serif"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="12sp"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/lstidincomeE"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="30dp"
+            android:fontFamily="serif"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="12sp"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/lstidproductE"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="30dp"
+            android:fontFamily="serif"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="12sp"
+            android:text="TextView"/>
+
+        <TextView
+            android:id="@+id/lstprice_buyE"
+            android:layout_width="0dp"
+            android:layout_weight="1.6"
+            android:layout_height="30dp"
+            android:fontFamily="serif"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="12sp"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/lstquantityE"
+            android:layout_width="0dp"
+            android:layout_weight="1.2"
+            android:layout_height="30dp"
+            android:fontFamily="serif"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="12sp"
+            android:text="TextView" />
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

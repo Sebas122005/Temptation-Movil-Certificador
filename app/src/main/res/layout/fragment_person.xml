@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frmPerson"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PersonFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:padding="3dp"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:typeface="serif"
+                android:text="Usuarios" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif"
+                android:text="Nombre :"/>
+
+            <EditText
+                android:id="@+id/txtNombre_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="15sp"
+                android:typeface="serif"
+                android:layout_weight="3"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif"
+                android:text="Apellidos :"/>
+
+            <EditText
+                android:id="@+id/txtApellidos_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3.5"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:typeface="serif"
+                android:textSize="12dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif"
+                android:layout_weight="0.1"
+                android:text="Fecha Nacimiento : "/>
+
+            <EditText
+                android:id="@+id/txtDateb_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:typeface="serif"
+                android:textSize="12sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif"
+                android:layout_weight="0.1"
+                android:text="DNI :"/>
+
+            <EditText
+                android:id="@+id/txtDni_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2.7"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:typeface="serif"
+                android:textSize="12dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif"
+                android:text="Genero :" />
+
+            <RadioGroup
+                android:id="@+id/rbtGroupSx"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rbtGenM"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:typeface="serif"
+                    android:textSize="12sp"
+                    android:text="Masculino"
+                    android:textAlignment="center" />
+
+                <RadioButton
+                    android:id="@+id/rbtGenF"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:typeface="serif"
+                    android:textSize="12sp"
+                    android:layout_weight="2"
+                    android:text="Femenino"
+                    android:textAlignment="center" />
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif"
+                android:layout_weight="0.1"
+                android:text="Dirección :" />
+
+            <EditText
+                android:id="@+id/txtDireccion_person"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12dp"/>
+            <TextView
+                android:id="@+id/lblRol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif"
+                android:layout_weight="0.1"
+                android:text="Rol :" />
+
+            <Spinner
+                android:id="@+id/spinner_Rol"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:autofillHints="Elegir Rol"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="50sp"
+                android:layout_height="20dp"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif"
+                android:text="Usuario :"/>
+
+            <EditText
+                android:id="@+id/txtUsuario_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="37sp"
+            android:layout_margin="3sp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Estado : "
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif" />
+
+            <CheckBox
+                android:id="@+id/chbestado_person"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1.5"
+                android:text="Activar"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="ID : "
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif" />
+            <TextView
+                android:id="@+id/lblid_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="*"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:typeface="serif" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnregistrar_person"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:padding="2dp"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="15sp"
+                android:typeface="serif"
+                android:text="REGISTRAR"/>
+
+            <Button
+                android:id="@+id/btnactualizar_person"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:padding="2dp"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="15sp"
+                android:typeface="serif"
+                android:text="ACTUALIZAR"/>
+
+            <Button
+                android:id="@+id/btneliminar_person"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_button"
+                android:padding="2dp"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="15sp"
+                android:typeface="serif"
+                android:text="ELIMINAR" />
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="30dp"
+                android:fontFamily="serif"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:textColor="#77893636"
+                android:text="DNI"
+                />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="2.8"
+                android:layout_height="30dp"
+                android:fontFamily="serif"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:textColor="#77893636"
+                android:text="Nombre" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="30dp"
+                android:fontFamily="serif"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:textColor="#77893636"
+                android:text="Rol" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="30dp"
+                android:fontFamily="serif"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:textColor="#77893636"
+                android:text="Usuario" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="2.3"
+                android:layout_height="30dp"
+                android:fontFamily="serif"
+                android:textColor="#77893636"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="12sp"
+                android:text="Estado" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <ListView
+                android:id="@+id/lstPerson"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="#77893636"
+                android:listSelector="#77893636" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>
+</androidx.core.widget.NestedScrollView>
