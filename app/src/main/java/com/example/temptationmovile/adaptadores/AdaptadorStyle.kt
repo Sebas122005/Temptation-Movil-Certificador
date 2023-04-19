@@ -6,51 +6,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.example.temptationmovile.R
+import com.example.temptationmovile.clases.Brand
 import com.example.temptationmovile.clases.Style
+import com.example.temptationmovile.viewHolder.BrandViewHolder
+import com.example.temptationmovile.viewHolder.EstiloViewHolder
 
-class AdaptadorStyle(contex:Context?,private val listastyle:List<Style>?):BaseAdapter() {
-
-    private val layoutInflater: LayoutInflater
-    init{
-        layoutInflater = LayoutInflater.from(contex)
-    }
-    override fun getCount(): Int {
-        return listastyle!!.size
-    }
-
-    override fun getItem(p0: Int): Any {
-        return listastyle!![p0]
+class AdaptadorStyle(private val lista: List<Style>?, val onClickListener: (Style, Int)->Unit, val onClickDeleteChangued:(Int, Style)->Unit):
+    RecyclerView.Adapter<EstiloViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EstiloViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        return EstiloViewHolder(layoutInflater.inflate(R.layout.elemento_lista_style,parent,false))
     }
 
-    override fun getItemId(p0: Int): Long {
-        return p0.toLong()
+    override fun getItemCount(): Int {
+        return lista!!.size
     }
 
-    override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
-        var vista = p1
-        if(vista == null){
-            vista=layoutInflater.inflate(R.layout.elemento_lista_style,p2,false)
-            val objstyle = getItem(p0) as Style
-
-            //creamos los controles
-            val lstidstyle = vista!!.findViewById<TextView>(R.id.lstidstyle)
-            val lstname_style = vista!!.findViewById<TextView>(R.id.lstname_style)
-            val lststate_style = vista!!.findViewById<TextView>(R.id.lststate_style)
-
-            //agregamos los valores a los controladores
-            lstidstyle.text = ""+objstyle.idstyles
-            lstname_style.text = ""+objstyle.name_sty
-            if(objstyle.state == 1)
-            {
-                lststate_style.text = "Habilitado"
-            }else{
-                lststate_style.text = "Deshabilitado"
-            }
-
-        }
-        return vista!!
+    override fun onBindViewHolder(holder: EstiloViewHolder, position: Int) {
+        val item = lista!![position]
+        holder.render(item,onClickListener,onClickDeleteChangued)
     }
-
 
 }

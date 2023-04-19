@@ -226,65 +226,14 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="12dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="12sp"
-                android:textColor="#77893636"
-                android:text="Id" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="3"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="12sp"
-                android:textColor="#77893636"
-                android:text="Producto" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1.4"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="12sp"
-                android:textColor="#77893636"
-                android:text="Cantidad" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="12sp"
-                android:textColor="#77893636"
-                android:text="Destino" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:layout_weight="1"
             android:orientation="horizontal">
 
-            <ListView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lstout"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
+                android:layout_height="match_parent"
                 android:backgroundTint="#77893636"
                 android:listSelector="#77893636" />
         </LinearLayout>

@@ -325,54 +325,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="12dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="0.5"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="15sp"
-                android:textColor="#77893636"
-                android:text="Id" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="15sp"
-                android:textColor="#77893636"
-                android:text="Nombre" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1.2"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="15sp"
-                android:textColor="#77893636"
-                android:text="Estado" />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:layout_weight="1"
             android:orientation="horizontal">
-        <ListView
-            android:id="@+id/lstlistarprovider"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:backgroundTint="#77893636"
-            android:listSelector="#77893636" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/lstlistarprovider"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="#77893636"
+                android:listSelector="#77893636" />
         </LinearLayout>
     </LinearLayout>
 

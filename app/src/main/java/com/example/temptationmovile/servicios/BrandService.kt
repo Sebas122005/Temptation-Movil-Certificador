@@ -8,14 +8,12 @@ interface BrandService {
     @GET("brands")
     fun MostrarBrand(): Call<List<Brand>>
 
-
     @POST("brand")
     fun RegistrarBrand(@Body b:Brand): Call<Brand>?
 
     @PUT("brand/{id}")
-    fun ActualizarBrand(@Path("id") id: Long, @Body b:Brand): Call<List<Brand>?>?
-
+    fun ActualizarBrand(@Path("id") id: Long, @Body b:Brand): Call<Brand>?
 
     @DELETE("brand/{id}")
-    fun EliminarBrand(@Path("id") id: Long ): Call<List<Brand>?>?
+    fun EliminarBrand(@Path("id") id: Long ): Call<Brand>?
 }

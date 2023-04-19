@@ -1,67 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="wrap_content">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="2"
+                android:fontFamily="serif"
+                android:text="Dni : "
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="14sp" />
+            <TextView
+                android:id="@+id/txtdniPerson"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="4"
+                android:fontFamily="serif"
+                android:text="12345678"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="14sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="2.4"
+                android:fontFamily="serif"
+                android:text="Nombres y Apellidos : "
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="14sp" />
+            <TextView
+                android:id="@+id/txtnamelPerson"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="3.6"
+                android:fontFamily="serif"
+                android:text="name"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="14sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="2"
+                android:fontFamily="serif"
+                android:text="Rol : "
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="14sp" />
+            <TextView
+                android:id="@+id/txtRolPerson"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="4"
+                android:fontFamily="serif"
+                android:text="rol"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="14sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="2"
+                android:fontFamily="serif"
+                android:text="Usuario : "
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="14sp" />
+            <TextView
+                android:id="@+id/txtUserPerson"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="4"
+                android:fontFamily="serif"
+                android:text="user"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="14sp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="2"
+                android:fontFamily="serif"
+                android:text="Estado : "
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="14sp" />
+            <TextView
+                android:id="@+id/txtEstadoPerson"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="4"
+                android:fontFamily="serif"
+                android:text="estado"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="14sp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/txtdniPerson"
-            android:layout_width="0dp"
-            android:layout_weight="2"
-            android:layout_height="30dp"
-            android:fontFamily="serif"
-            android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="12sp"
-            android:text="TextView" />
-
-        <TextView
-            android:id="@+id/txtnamelPerson"
-            android:layout_width="0dp"
-            android:layout_weight="2.8"
-            android:layout_height="30dp"
-            android:fontFamily="serif"
-            android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="12sp"
-            android:text="TextView" />
-
-        <TextView
-            android:id="@+id/txtRolPerson"
-            android:layout_width="0dp"
-            android:layout_weight="2"
-            android:layout_height="30dp"
-            android:fontFamily="serif"
-            android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="12sp"
-            android:text="TextView" />
-
-        <TextView
-            android:id="@+id/txtUserPerson"
-            android:layout_width="0dp"
-            android:layout_weight="2"
-            android:layout_height="30dp"
-            android:fontFamily="serif"
-            android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="12sp"
-            android:text="TextView" />
-
-        <TextView
-            android:id="@+id/txtEstadoPerson"
-            android:layout_width="0dp"
-            android:layout_weight="2.3"
-            android:layout_height="30dp"
-            android:fontFamily="serif"
-            android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textSize="12sp"
-            android:text="TextView" />
-
+            <Button
+                android:id="@+id/idbtnEstadoPersona"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:backgroundTint="#1657C8"
+                android:fontFamily="serif"
+                android:padding="0dp"
+                android:text="*Activar*"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textSize="16sp" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

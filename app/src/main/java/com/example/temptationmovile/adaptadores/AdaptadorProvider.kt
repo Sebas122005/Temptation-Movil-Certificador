@@ -6,47 +6,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.example.temptationmovile.R
 import com.example.temptationmovile.clases.Brand
 import com.example.temptationmovile.clases.Provider
+import com.example.temptationmovile.viewHolder.BrandViewHolder
+import com.example.temptationmovile.viewHolder.ProveedorViewHolder
 
-class AdaptadorProvider(context: Context?, private val listprov: List<Provider>?): BaseAdapter() {
-    private val layoutInflater: LayoutInflater
-    init {
-        layoutInflater =  LayoutInflater.from(context)
+class AdaptadorProvider (private val lista: List<Provider>?,val onClickListener: (Provider,Int)->Unit ,val onClickDeleteChangued:(Int,Provider)->Unit):
+RecyclerView.Adapter<ProveedorViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProveedorViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        return ProveedorViewHolder(layoutInflater.inflate(R.layout.elemento_lista_provider,parent,false))
     }
 
-    override fun getCount(): Int {
-        return listprov!!.size
+    override fun getItemCount(): Int {
+        return lista!!.size
     }
 
-    override fun getItem(p0: Int): Any {
-        return listprov!![p0]
+    override fun onBindViewHolder(holder: ProveedorViewHolder, position: Int) {
+        val item = lista!![position]
+        holder.render(item,onClickListener,onClickDeleteChangued)
     }
 
-    override fun getItemId(p0: Int): Long {
-        return p0.toLong()
-    }
-
-    override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
-        var vista = p1
-        if(vista == null){
-            vista = layoutInflater.inflate(R.layout.elemento_lista_provider,p2,false);
-            val objprov =  getItem(p0) as Provider
-            //creamos los controladores
-            val lstidprov = vista!!.findViewById<TextView>(R.id.lstidprov)
-            val lstname_prov = vista!!.findViewById<TextView>(R.id.lstname_prov)
-            val lststate_pro = vista!!.findViewById<TextView>(R.id.lststate_pro)
-
-            lstidprov.text =""+objprov.idprovider
-            lstname_prov.text = ""+objprov.name_prov
-            if (objprov.state == 1){
-                lststate_pro.text = "Habilitado"
-            }else{
-                lststate_pro.text = "Desabilitado"
-            }
-        }
-        return vista!!;
-    }
 
 }

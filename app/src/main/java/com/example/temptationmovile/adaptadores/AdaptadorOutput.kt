@@ -6,47 +6,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.example.temptationmovile.R
+import com.example.temptationmovile.clases.Brand
 import com.example.temptationmovile.clases.Output
 import com.example.temptationmovile.clases.Product
+import com.example.temptationmovile.viewHolder.BrandViewHolder
+import com.example.temptationmovile.viewHolder.OutputViewHolder
 
-class AdaptadorOutput(context: Context?, private val listoutput: List<Output>?): BaseAdapter() {
-
-    private val layoutInflater: LayoutInflater
-    init {
-        layoutInflater = LayoutInflater.from(context)
-
+class AdaptadorOutput(private val lista: List<Output>?, val onClickListener: (Output, Int)->Unit):
+    RecyclerView.Adapter<OutputViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OutputViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        return OutputViewHolder(layoutInflater.inflate(R.layout.elemento_lista_output,parent,false))
     }
 
-    override fun getCount(): Int {
-        return listoutput!!.size
+    override fun getItemCount(): Int {
+        return lista!!.size
     }
 
-    override fun getItem(p0: Int): Any {
-        return listoutput!![p0]
-    }
-
-    override fun getItemId(p0: Int): Long {
-        return p0.toLong()
-    }
-
-    override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
-        var vista = p1
-        if(vista == null){
-            vista = layoutInflater.inflate(R.layout.elemento_lista_output,p2,false)
-            val objoutput = getItem(p0) as Output
-            val lblidoutput = vista!!.findViewById<TextView>(R.id.lblidoutput)
-            val lblidprod = vista!!.findViewById<TextView>(R.id.lblidprod)
-            val lblcant = vista!!.findViewById<TextView>(R.id.lblcant)
-            val lbldestino = vista!!.findViewById<TextView>(R.id.lbldestino)
-
-            lblidoutput.text = ""+objoutput.idout
-            lblidprod.text = ""+objoutput.idproduc
-            lblcant.text = ""+objoutput.quantity
-            lbldestino.text = ""+objoutput.destino
-
-        }
-        return vista!!
+    override fun onBindViewHolder(holder: OutputViewHolder, position: Int) {
+        val item = lista!![position]
+        holder.render(item,onClickListener)
     }
 
 }

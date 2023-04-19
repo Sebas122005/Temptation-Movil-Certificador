@@ -260,69 +260,6 @@
                 android:typeface="serif"
                 android:text="IR COMPRAS" />
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="12dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="12sp"
-                android:textColor="#77893636"
-                android:text="Id" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="12sp"
-                android:textColor="#77893636"
-                android:text="Compra" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="3"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="12sp"
-                android:textColor="#77893636"
-                android:text="Producto"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1.6"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="12sp"
-                android:textColor="#77893636"
-                android:text="Precio" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1.2"
-                android:layout_height="30dp"
-                android:fontFamily="serif"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="12sp"
-                android:textColor="#77893636"
-                android:text="Cantidad" />
-
-        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -330,7 +267,7 @@
             android:layout_weight="1"
             android:orientation="horizontal">
 
-            <ListView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lstdetailincome"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

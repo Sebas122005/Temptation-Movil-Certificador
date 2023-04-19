@@ -94,6 +94,7 @@ class incomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val context=requireContext()
         // Inflate the layout for this fragment
         val raiz = inflater.inflate(R.layout.fragment_income, container, false)
         txtfechainco = raiz.findViewById(R.id.txtfechacomprainco)
@@ -186,7 +187,6 @@ class incomeFragment : Fragment() {
             ft?.addToBackStack(null)
             ft?.commit()
         }
-        bnGenerarCotizacion
 
         lstinco.setOnItemClickListener { adapterView, view, i, l ->
             fila = i

@@ -6,47 +6,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.example.temptationmovile.R
+import com.example.temptationmovile.clases.Brand
 import com.example.temptationmovile.clases.Rol
 import com.example.temptationmovile.clases.Size
+import com.example.temptationmovile.viewHolder.BrandViewHolder
+import com.example.temptationmovile.viewHolder.SizeViewHolder
 
-class AdaptadorSize( context: Context?, private val listsize: List<Size>?): BaseAdapter() {
-
-    private val layoutInflater: LayoutInflater
-    init {
-        layoutInflater =  LayoutInflater.from(context)
+class AdaptadorSize(private val lista: List<Size>?, val onClickListener: (Size, Int)->Unit, val onClickDeleteChangued:(Int, Size)->Unit):
+    RecyclerView.Adapter<SizeViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SizeViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        return SizeViewHolder(layoutInflater.inflate(R.layout.elemento_lista_size,parent,false))
     }
 
-    override fun getCount(): Int {
-        return  listsize!!.size
+    override fun getItemCount(): Int {
+        return lista!!.size
     }
 
-    override fun getItem(position: Int): Any {
-        return listsize!![position]
+    override fun onBindViewHolder(holder: SizeViewHolder, position: Int) {
+        val item = lista!![position]
+        holder.render(item, onClickListener, onClickDeleteChangued)
     }
 
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
-    }
-
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var vista = convertView
-        if(vista == null){
-            vista = layoutInflater.inflate(R.layout.elemento_lista_size,parent,false);
-            val objsiz =  getItem(position) as Size
-            //creamos los controladores
-            val lstcodsiz = vista!!.findViewById<TextView>(R.id.lstcodsiz)
-            val lstnamesiz = vista!!.findViewById<TextView>(R.id.lstnamesiz)
-            val lststate_siz = vista!!.findViewById<TextView>(R.id.lststate_siz)
-
-            lstcodsiz.text =""+objsiz.idsize
-            lstnamesiz.text = ""+objsiz.name_size
-            if (objsiz.state == 1){
-                lststate_siz.text = "Habilitado"
-            }else{
-                lststate_siz.text = "Desabilitado"
-            }
-        }
-        return vista!!;
-    }
 }
