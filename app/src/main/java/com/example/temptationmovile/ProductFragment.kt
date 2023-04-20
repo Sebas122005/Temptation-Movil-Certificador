@@ -20,6 +20,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.temptationmovile.adaptadores.*
 import com.example.temptationmovile.clases.*
 import com.example.temptationmovile.remoto.ApiUtil
@@ -28,7 +29,7 @@ import com.example.temptationmovile.utilidad.Util
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
-
+import com.example.temptationmovile.databinding.FragmentProductBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,53 +48,12 @@ private const val ARG_PARAM2 = "param2"
  */
 class ProductFragment : Fragment() {
     // TODO: Rename and change types of parameters
-
-   private lateinit var cbobrad: Spinner
-   private lateinit var cbocolor: Spinner
-   private lateinit var cbosize: Spinner
-   private lateinit var cbocategory: Spinner
-   private lateinit var cbostyle: Spinner
-   private lateinit var lstPro: ListView
-   private lateinit var txtNomPro: EditText
-   private lateinit var txtdescrip: EditText
-   private lateinit var txtStock: EditText
-   private lateinit var txtprice: EditText
-   private lateinit var chkEstPro: CheckBox
-   private lateinit var lblCodPro: TextView
-   private lateinit var btnRegistrarProd: Button
-   private lateinit var btnActualizarProd: Button
-   private lateinit var btnEliminarProd: Button
-   private lateinit var idStockMinimo:EditText
-   private lateinit var btnReporteproductMinStock:Button
-
-   private val objBrand = Brand()
+    private var _binding:FragmentProductBinding?=null
+    private val binding get() = _binding!!
+    private lateinit var adaptadorProduct: AdaptadorProduct
+    private var llmanager:LinearLayoutManager?=null
     private val objproducto = Product()
-    private var cod = 0
-    private var nom = ""
-    private var descri = ""
-    private var stock = 0
-    private var price = 0.0
-    private var idbramd = 0
-    private var codbrand = 0
-    private var idcolor = 0
-    private var codcolor = 0
-    private var idstyle = 0
-    private var codstyle = 0
-    private var idcategory = 0
-    private var codcategory = 0
-    private var idsize = 0
-    private var codsize = 0
-    private var state = 1
-    private var fila = -1
-    private var pos = -1
-    val raiz = null
-
-    private var indiceB = 0
-    private var indiceC = 0
-    private var indiceCo = 0
-    private var indiceSy = 0
-    private var indiceSi = 0
-
+    private var fila:Int?= null
     private var brandService: BrandService? = null
     private var colorService: ColorService? = null
     private var styleService: StyleService? = null
@@ -101,7 +61,7 @@ class ProductFragment : Fragment() {
     private var categoryService: CategoryService? = null
     private var productService: ProductService? = null
 
-    private var registroProducto: List<Product>? = null
+    private var registroProducto: MutableList<Product>? = null
     private var registrocolor: List<Color>? = null
     private var registrostyle: List<Style>? = null
     private var registrosize: List<Size>? = null
@@ -111,39 +71,16 @@ class ProductFragment : Fragment() {
     var objutilidad =  Util()
     private var dialogo: AlertDialog.Builder? = null
     var ft: FragmentTransaction?= null
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val raiz = inflater.inflate(R.layout.fragment_product, container, false)
-        btnReporteproductMinStock=raiz.findViewById(R.id.btnReporteproductMinStock)
-        idStockMinimo=raiz.findViewById(R.id.idStockMinimo)
-        txtNomPro = raiz.findViewById(R.id.txtnombreProd)
-        txtdescrip = raiz.findViewById(R.id.txtdescripcionProd)
-        txtStock = raiz.findViewById(R.id.txtstockProd)
-        txtprice =raiz.findViewById(R.id.txtpriceProd)
-        lblCodPro = raiz.findViewById(R.id.codProduct)
-        chkEstPro = raiz.findViewById(R.id.chkStateProd)
-        btnRegistrarProd =raiz.findViewById(R.id.btnregistrarproduct)
-        btnEliminarProd = raiz.findViewById(R.id.btneliminarproduct)
-        btnActualizarProd =raiz.findViewById(R.id.btnactualizarproduct)
-
-        cbobrad = raiz.findViewById(R.id.cboBrand)
-        cbocategory = raiz.findViewById(R.id.cboCategory)
-        cbocolor = raiz.findViewById(R.id.cbocolor)
-        cbosize = raiz.findViewById(R.id.cboSize)
-        cbostyle = raiz.findViewById(R.id.cboStyle)
-        lstPro = raiz.findViewById(R.id.lstPro)
-        lstPro.isNestedScrollingEnabled = true
-
+        _binding = FragmentProductBinding.inflate(inflater, container, false)
+        var context=binding.root.context
+        llmanager= LinearLayoutManager(context)
+        binding.lstPro.isNestedScrollingEnabled = true
 
         registroBrand = ArrayList()
         registroProducto = ArrayList()
@@ -159,159 +96,76 @@ class ProductFragment : Fragment() {
         styleService = ApiUtil.styleService
         colorService = ApiUtil.colorservice
 
-        mostrarComboBrand(raiz.context)
-        mostrarproduct(raiz.context)
-        mostrarComboStyle(raiz.context)
-        mostrarComboColor(raiz.context)
-        mostrarComboCategory(raiz.context)
-        mostrarcomboSize(raiz.context)
+        mostrarComboBrand(context)
+        mostrarproduct(context)
+        mostrarComboStyle(context)
+        mostrarComboColor(context)
+        mostrarComboCategory(context)
+        mostrarcomboSize(context)
 
 
-        btnRegistrarProd.setOnClickListener {
-            if(txtNomPro.text.toString() ==""){
-                objutilidad.MensajeToast(raiz.context,"Ingresa el Nombre")
-                txtNomPro.requestFocus()
-            }else if(txtdescrip.text.toString() == ""){
-                objutilidad.MensajeToast(raiz.context,"Ingresa la descripcion")
-                txtdescrip.requestFocus()
-            }else if(txtprice.text.toString()==""){
-                objutilidad.MensajeToast(raiz.context,"Ingrese un precio")
-                txtprice.requestFocus()
-            }else if(txtStock.text.toString()==""){
-                objutilidad.MensajeToast(raiz.context,"Ingrese el stock")
-                txtStock.requestFocus()
-            }else if(cbobrad.selectedItemPosition==-1){
-                objutilidad.MensajeToast(raiz.context,"Seleccionne una Marca")
-                cbobrad.requestFocus()
+        binding.btnregistrarproduct.setOnClickListener {
+            if(binding.txtnombreProd.text.toString() ==""){
+                objutilidad.MensajeToast(context,"Ingresa el Nombre")
+                binding.txtnombreProd.requestFocus()
+            }else if(binding.txtdescripcionProd.text.toString() == ""){
+                objutilidad.MensajeToast(context,"Ingresa la descripcion")
+                binding.txtdescripcionProd.requestFocus()
+            }else if(binding.txtpriceProd.text.toString()==""){
+                objutilidad.MensajeToast(context,"Ingrese un precio")
+                binding.txtpriceProd.requestFocus()
+            }else if(binding.txtstockProd.text.toString()==""){
+                objutilidad.MensajeToast(context,"Ingrese el stock")
+                binding.txtstockProd.requestFocus()
+            }else if(binding.cboBrand.selectedItemPosition==-1){
+                objutilidad.MensajeToast(context,"Seleccionne una Marca")
+                binding.cboBrand.requestFocus()
             }else{
-                nom =txtNomPro.text.toString()
-                descri = txtdescrip.text.toString()
-                price = txtprice.text.toString().toDouble()
-                stock = txtStock.text.toString().toInt()
-                idbramd = cbobrad.selectedItemPosition
-                codbrand = (registroBrand as ArrayList<Brand>).get(idbramd).idbrand
-                idcolor = cbocolor.selectedItemPosition
-                codcolor = (registrocolor as ArrayList<Color>).get(idcolor).idcolor
-                idcategory = cbocategory.selectedItemPosition
-                codcategory = (registrocategory as ArrayList<Category>).get(idcategory).idcat
-                idstyle = cbostyle.selectedItemPosition
-                codstyle = (registrostyle as ArrayList<Style>).get(idstyle).idstyles
-                idsize = cbosize.selectedItemPosition
-                codsize = (registrosize as ArrayList<Size>).get(idsize).idsize
-                state = if (chkEstPro.isChecked) 1 else 0
-
-
-
-                objproducto.idcat = codcategory
-                objproducto.idsize = codsize
-                objproducto.idstyles = codstyle
-                objproducto.idbrand = codbrand
-                objproducto.idcolor = codcolor
-                objproducto.name_p = nom
-                objproducto.description = descri
-                objproducto.price = price
-                objproducto.stock = stock
+                objproducto.idcat = (registrocategory as ArrayList<Category>).get(binding.cboCategory.selectedItemPosition).idcat
+                objproducto.idsize = (registrosize as ArrayList<Size>).get(binding.cboSize.selectedItemPosition).idsize
+                objproducto.idstyles = (registrostyle as ArrayList<Style>).get(binding.cboStyle.selectedItemPosition).idstyles
+                objproducto.idbrand = (registroBrand as ArrayList<Brand>).get(binding.cboBrand.selectedItemPosition).idbrand
+                objproducto.idcolor = (registrocolor as ArrayList<Color>).get(binding.cbocolor.selectedItemPosition).idcolor
+                objproducto.name_p = binding.txtnombreProd.text.toString()
+                objproducto.description = binding.txtdescripcionProd.text.toString()
+                objproducto.price = binding.txtpriceProd.text.toString().toDouble()
+                objproducto.stock = binding.txtstockProd.text.toString().toInt()
                 objproducto.image_front = ""
                 objproducto.image_back = ""
                 objproducto.image_using = ""
-                objproducto.state = state
+                objproducto.state = if (binding.chkStateProd.isChecked) 1 else 0
 
-                registrarProducto(raiz.context,objproducto)
+                registrarProducto(context,objproducto)
                 val fproducto = ProductFragment()
-                DialogoCRUDEliminar("Registro de Producto", "Se registro el Producto Correctamente",fproducto)
-
-            }
-        }
-        lstPro.setOnItemClickListener { adapterView, view, i, l ->
-            fila = i
-            lblCodPro.text = (registroProducto as ArrayList<Product>).get(fila).idproduc.toString()
-           txtNomPro.setText(""+ (registroProducto as ArrayList<Product>).get(fila).name_p.toString())
-            txtdescrip.setText(""+ (registroProducto as ArrayList<Product>).get(fila).description.toString())
-            txtprice.setText(""+ (registroProducto as ArrayList<Product>).get(fila).price.toString().toDouble())
-           txtStock.setText(""+ (registroProducto as ArrayList<Product>).get(fila).stock.toString().toInt())
-            for (x in (registroBrand as ArrayList<Brand>).indices){
-                    if((registroBrand as ArrayList<Brand>).get(x).idbrand == (registroProducto as ArrayList<Product>).get(fila).idbrand){
-                        indiceB = x
-                    }
-            }
-
-            for (x in (registrocolor as ArrayList<Color>).indices){
-                if((registrocolor as ArrayList<Color>).get(x).idcolor == (registroProducto as ArrayList<Product>).get(fila).idcolor){
-                    indiceCo = x
-                }
-            }
-            for (x in (registrocategory as ArrayList<Category>).indices){
-                if((registrocategory as ArrayList<Category>).get(x).idcat == (registroProducto as ArrayList<Product>).get(fila).idcat){
-                    indiceC = x
-                }
-            }
-            for (x in (registrosize as ArrayList<Size>).indices){
-                if((registrosize as ArrayList<Size>).get(x).idsize == (registroProducto as ArrayList<Product>).get(fila).idsize){
-                    indiceSi = x
-                }
-            }
-
-            for (x in (registrostyle as ArrayList<Style>).indices){
-                if((registrostyle as ArrayList<Style>).get(x).idstyles == (registroProducto as ArrayList<Product>).get(fila).idstyles){
-                    indiceSy = x
-                }
-            }
-            cbobrad.setSelection(indiceB)
-            cbocolor.setSelection(indiceCo)
-            cbocategory.setSelection(indiceC)
-            cbosize.setSelection(indiceSi)
-            cbostyle.setSelection(indiceSy)
-            if((registroProducto as ArrayList<Product>).get(fila).state != 0){
-                chkEstPro.setChecked(true)
-            }else{
-                chkEstPro.setChecked(false)
+                DialogoCRUD("Registro de Producto", "Se registro el Producto Correctamente",fproducto)
             }
         }
 
-        btnActualizarProd.setOnClickListener {
-            if(fila >=0){
-                cod = lblCodPro.text.toString().toInt()
-                nom =txtNomPro.text.toString()
-                descri = txtdescrip.text.toString()
-                price = txtprice.text.toString().toDouble()
-                stock = txtStock.text.toString().toInt()
-                idbramd = cbobrad.selectedItemPosition
-                codbrand = (registroBrand as ArrayList<Brand>).get(idbramd).idbrand
-                idcolor = cbocolor.selectedItemPosition
-                codcolor = (registrocolor as ArrayList<Color>).get(idcolor).idcolor
-                idcategory = cbocategory.selectedItemPosition
-                codcategory = (registrocategory as ArrayList<Category>).get(idcategory).idcat
-                idstyle = cbostyle.selectedItemPosition
-                codstyle = (registrostyle as ArrayList<Style>).get(idstyle).idstyles
-                idsize = cbosize.selectedItemPosition
-                codsize = (registrosize as ArrayList<Size>).get(idsize).idsize
-                state = if (chkEstPro.isChecked) 1 else 0
-
-
-
-                objproducto.idproduc = cod
-                objproducto.idcat = codcategory
-                objproducto.idsize = codsize
-                objproducto.idstyles = codstyle
-                objproducto.idbrand = codbrand
-                objproducto.idcolor = codcolor
-                objproducto.name_p = nom
-                objproducto.description = descri
-                objproducto.price = price
-                objproducto.stock = stock
+        binding.btnactualizarproduct.setOnClickListener {
+            if(fila !=null){
+                objproducto.idcat = (registrocategory as ArrayList<Category>).get(binding.cboCategory.selectedItemPosition).idcat
+                objproducto.idsize = (registrosize as ArrayList<Size>).get(binding.cboSize.selectedItemPosition).idsize
+                objproducto.idstyles = (registrostyle as ArrayList<Style>).get(binding.cboStyle.selectedItemPosition).idstyles
+                objproducto.idbrand = (registroBrand as ArrayList<Brand>).get(binding.cboBrand.selectedItemPosition).idbrand
+                objproducto.idcolor = (registrocolor as ArrayList<Color>).get(binding.cbocolor.selectedItemPosition).idcolor
+                objproducto.name_p = binding.txtnombreProd.text.toString()
+                objproducto.description = binding.txtdescripcionProd.text.toString()
+                objproducto.price = binding.txtpriceProd.text.toString().toDouble()
+                objproducto.stock = binding.txtstockProd.text.toString().toInt()
                 objproducto.image_front = ""
                 objproducto.image_back = ""
                 objproducto.image_using = ""
-                objproducto.state = state
-                ActualizarProduct(raiz.context,objproducto,cod.toLong())
+                objproducto.state = if (binding.chkStateProd.isChecked) 1 else 0
+                objproducto.idproduc=binding.codProduct.text.toString().toInt()
+                ActualizarProduct(context,objproducto,objproducto.idproduc.toLong())
                 val fproducto = ProductFragment()
-                DialogoCRUDEliminar("Actualizacion de Producto", "Se Actualizo el Producto Correctamente",fproducto)
+                DialogoCRUD("Actualizacion de Producto", "Se Actualizo el Producto Correctamente",fproducto)
             }else{
-                objutilidad.MensajeToast(raiz.context,"Seleccione un elemento de la lista")
-                lstPro.requestFocus()
+                objutilidad.MensajeToast(context,"Seleccione un elemento de la lista")
+                binding.lstPro.requestFocus()
             }
         }
-        btnEliminarProd.setOnClickListener {
+        binding.btnGenerarReporteproduct.setOnClickListener {
             val document = Document(PageSize.A4,50f,50f,50f,50f)
             val fileName = "mi_lista_productos.pdf"
             val filePath = requireContext().getExternalFilesDirs(Environment.DIRECTORY_DOCUMENTS)?.get(0)?.absolutePath + "/" + fileName
@@ -324,7 +178,7 @@ class ProductFragment : Fragment() {
             titleParagraph.alignment = Element.ALIGN_CENTER
             document.add(titleParagraph)
             document.add(Paragraph(""))
-            registroProducto=reporte()
+            registroProducto=reporte() as MutableList<Product>
             var tabla = PdfPTable(11)
             tabla.addCell("ID")
             tabla.addCell("Categoria")
@@ -341,31 +195,6 @@ class ProductFragment : Fragment() {
                 var act=""
                 var nombre=""
                 tabla.addCell(item.idproduc.toString())
-                /*for (x in (registrocategory as ArrayList<Category>).indices){
-                    if((registrocategory as ArrayList<Category>).get(x).idcat == (registroProducto as ArrayList<Product>).get(item.idproduc).idcat){
-                        tabla.addCell((registrocategory as ArrayList<Category>).get(x).name_cat)
-                    }
-                }
-                for (x in (registrosize as ArrayList<Size>).indices){
-                    if((registrosize as ArrayList<Size>).get(x).idsize == (registroProducto as ArrayList<Product>).get(item.idproduc).idsize){
-                        tabla.addCell((registrosize as ArrayList<Size>).get(x).name_size)
-                    }
-                }
-                for (x in (registrostyle as ArrayList<Style>).indices){
-                    if((registrostyle as ArrayList<Style>).get(x).idstyles == (registroProducto as ArrayList<Product>).get(item.idproduc).idstyles){
-                        tabla.addCell((registrostyle as ArrayList<Style>).get(x).name_sty.toString())
-                    }
-                }
-                for (x in (registroBrand as ArrayList<Brand>).indices){
-                    if((registroBrand as ArrayList<Brand>).get(x).idbrand == (registroProducto as ArrayList<Product>).get(item.idproduc).idbrand){
-                        tabla.addCell((registroBrand as ArrayList<Brand>).get(x).name_brand)
-                    }
-                }
-                for (x in (registrocolor as ArrayList<Color>).indices){
-                    if((registrocolor as ArrayList<Color>).get(x).idcolor == (registroProducto as ArrayList<Product>).get(item.idproduc).idcolor){
-                        tabla.addCell((registrocolor as ArrayList<Color>).get(x).name_col)
-                    }
-                }*/
                 tabla.addCell(item.idcat.toString())
                 tabla.addCell(item.idsize.toString())
                 tabla.addCell(item.idstyles.toString())
@@ -395,11 +224,10 @@ class ProductFragment : Fragment() {
             }
         }
 
-        btnReporteproductMinStock.setOnClickListener {
-            if (idStockMinimo.text.toString().length<1){
-                Toast.makeText(raiz.context,"Debe ingresar un valor como stock mínimo",Toast.LENGTH_LONG).show()
+        binding.btnReporteproductMinStock.setOnClickListener {
+            if (binding.idStockMinimo.text.toString().length<1){
+                Toast.makeText(context,"Debe ingresar un valor como stock mínimo",Toast.LENGTH_LONG).show()
             }else {
-                println("Accede else")
                 val document = Document(PageSize.A4, 50f, 50f, 50f, 50f)
                 val fileName = "mi_lista_productos_minimo_stock.pdf"
                 val filePath =
@@ -416,7 +244,7 @@ class ProductFragment : Fragment() {
                 titleParagraph.alignment = Element.ALIGN_CENTER
                 document.add(titleParagraph)
                 document.add(Paragraph(""))
-                registroProducto = reporte()
+                registroProducto = reporte() as MutableList<Product>
                 var tabla = PdfPTable(11)
                 tabla.addCell("ID")
                 tabla.addCell("Categoria")
@@ -431,8 +259,7 @@ class ProductFragment : Fragment() {
                 tabla.addCell("Estado")
                 var cantReportMinStock = 0
                 for (item in registroProducto!!){
-                    println("Valor ingresado : "+idStockMinimo.text.toString())
-                    if (item.stock <= idStockMinimo.text.toString().toInt()) {
+                    if (item.stock <= binding.idStockMinimo.text.toString().toInt()) {
                         cantReportMinStock = cantReportMinStock + 1
                         var act = ""
                         var nombre = ""
@@ -473,12 +300,12 @@ class ProductFragment : Fragment() {
                         startActivity(intentChooser)
                     }
                 }else{
-                    Toast.makeText(raiz.context,"No se encontraron Productos con el valor stock minimo ingresado",Toast.LENGTH_LONG).show()
+                    Toast.makeText(context,"No se encontraron Productos con el valor stock minimo ingresado",Toast.LENGTH_LONG).show()
                 }
             }
         }
 
-        return  raiz
+        return  binding.root
     }
 
     fun reporte():List<Product>{
@@ -487,7 +314,7 @@ class ProductFragment : Fragment() {
             override fun onResponse(call: Call<List<Product>>, response: Response<List<Product>>) {
                 if(response.isSuccessful){
                     println("Correcto")
-                    registroProducto = response.body()
+                    registroProducto = response.body() as MutableList<Product>
                 }else{
                     println("Error")
                 }
@@ -508,10 +335,9 @@ class ProductFragment : Fragment() {
             override fun onResponse(call: Call<List<Brand>?>, response: Response<List<Brand>?>) {
                 if(response.isSuccessful){
                     registroBrand = response.body()
-                    cbobrad.adapter = AdaptadorComboBrand(context, registroBrand)
+                    binding.cboBrand.adapter = AdaptadorComboBrand(context, registroBrand)
                 }
             }
-
             override fun onFailure(call: Call<List<Brand>?>, t: Throwable) {
                 Log.e("Error: ", t.message.toString())
             }
@@ -525,10 +351,9 @@ class ProductFragment : Fragment() {
             override fun onResponse(call: Call<List<Style>?>, response: Response<List<Style>?>) {
                 if(response.isSuccessful){
                     registrostyle = response.body()
-                    cbostyle.adapter = AdaptadorComboEstilo(context,registrostyle)
+                    binding.cboStyle.adapter = AdaptadorComboEstilo(context,registrostyle)
                 }
             }
-
             override fun onFailure(call: Call<List<Style>?>, t: Throwable) {
                 Log.e("Error: ", t.message.toString())
             }
@@ -541,10 +366,9 @@ class ProductFragment : Fragment() {
             override fun onResponse(call: Call<List<Color>?>, response: Response<List<Color>?>) {
                 if(response.isSuccessful){
                     registrocolor = response.body()
-                    cbocolor.adapter = AdaptadorComboColor(context,registrocolor)
+                    binding.cbocolor.adapter = AdaptadorComboColor(context,registrocolor)
                 }
             }
-
             override fun onFailure(call: Call<List<Color>?>, t: Throwable) {
                 Log.e("Error: ", t.message.toString())
             }
@@ -561,10 +385,9 @@ class ProductFragment : Fragment() {
             ) {
                 if(response.isSuccessful){
                     registrocategory = response.body()
-                    cbocategory.adapter = AdaptadorComboCategory(context,registrocategory)
+                    binding.cboCategory.adapter = AdaptadorComboCategory(context,registrocategory)
                 }
             }
-
             override fun onFailure(call: Call<List<Category>?>, t: Throwable) {
                 Log.e("Error: ", t.message.toString())
             }
@@ -578,25 +401,74 @@ class ProductFragment : Fragment() {
             override fun onResponse(call: Call<List<Size>?>, response: Response<List<Size>?>) {
                 if(response.isSuccessful){
                     registrosize = response.body()
-                    cbosize.adapter = AdaptadorComboSize(context,registrosize)
+                    binding.cboSize.adapter = AdaptadorComboSize(context,registrosize)
                 }
             }
-
             override fun onFailure(call: Call<List<Size>?>, t: Throwable) {
                 Log.e("Error: ", t.message.toString())
             }
 
         })
     }
+    fun onClickListener(pro:Product,pos:Int){
+        fila = pos
+        binding.codProduct.setText(pro.idproduc.toString())
+        binding.txtnombreProd.setText(pro.name_p.toString())
+        binding.txtdescripcionProd.setText(pro.description.toString())
+        binding.txtpriceProd.setText(pro.price.toString())
+        binding.txtstockProd.setText(pro.stock.toString())
+        for (x in (registroBrand as ArrayList<Brand>).indices){
+            if((registroBrand as ArrayList<Brand>).get(x).idbrand == pro.idbrand){
+                binding.cboBrand.setSelection(x)
+            }
+        }
 
+        for (x in (registrocolor as ArrayList<Color>).indices){
+            if((registrocolor as ArrayList<Color>).get(x).idcolor == pro.idcolor){
+                binding.cbocolor.setSelection(x)
+            }
+        }
+        for (x in (registrocategory as ArrayList<Category>).indices){
+            if((registrocategory as ArrayList<Category>).get(x).idcat == pro.idcat){
+                binding.cboCategory.setSelection(x)
+            }
+        }
+        for (x in (registrosize as ArrayList<Size>).indices){
+            if((registrosize as ArrayList<Size>).get(x).idsize == pro.idsize){
+                binding.cboSize.setSelection(x)
+            }
+        }
+        for (x in (registrostyle as ArrayList<Style>).indices){
+            if((registrostyle as ArrayList<Style>).get(x).idstyles == pro.idstyles){
+                binding.cboStyle.setSelection(x)
+            }
+        }
+        if(pro.state==1){
+            binding.chkStateProd.setChecked(true)
+        }else{
+            binding.chkStateProd.setChecked(false)
+        }
+    }
+    fun onClickDeleteChangued(pos:Int,pro: Product){
+        if (pro.state==1){
+            EliminarProduct(binding.root.context,pro.idproduc.toLong())
+            DialogoCRUD("Producto Deshabilitado","Se deshabilito el estado del producto "+pro.name_p,ProductFragment())
+        }else{
+            pro.state=1
+            ActualizarProduct(binding.root.context,pro,pro.idproduc.toLong())
+            DialogoCRUD("Producto Habilitado","Se habilitó el estado del producto "+pro.name_p,ProductFragment())
+        }
+    }
     fun mostrarproduct(context: Context){
         val call = productService!!.MostrarProduct()
         call!!.enqueue(object :Callback<List<Product>>{
             override fun onResponse(call: Call<List<Product>>, response: Response<List<Product>>) {
                 if(response.isSuccessful){
                     println("Correcto")
-                    registroProducto = response.body()
-                    lstPro.adapter = AdaptadorProduct(context,registroProducto)
+                    registroProducto = response.body() as MutableList<Product>
+                    adaptadorProduct = AdaptadorProduct(lista=registroProducto!!,
+                        onClickListener={b,pos->onClickListener(b,pos)},
+                        onClickDeleteChangued={del,bra->onClickDeleteChangued(del,bra)})
                 }else{
                     println("Error")
                 }
@@ -626,33 +498,31 @@ class ProductFragment : Fragment() {
     }
     fun ActualizarProduct(context: Context, p:Product, id: Long ){
         val call = productService!!.ActualizarProduct(id,p)
-        call!!.enqueue(object : Callback<List<Product>?>{
-            override fun onResponse(call: Call<List<Product>?>, response: Response<List<Product>?>) {
+        call!!.enqueue(object : Callback<Product?>{
+            override fun onResponse(call: Call<Product?>, response: Response<Product?>) {
                 if(response.isSuccessful){
                     Log.e("Mensaje", "Se actualizo correctamente el Producto")
+                    fila=null
                 }
             }
 
-            override fun onFailure(call: Call<List<Product>?>, t: Throwable) {
+            override fun onFailure(call: Call<Product?>, t: Throwable) {
                 Log.e("Error: ",t.message!!)
             }
-
         })
     }
 
     fun EliminarProduct(context: Context, id: Long){
         val call = productService!!.EliminarProduct(id)
-        call!!.enqueue(object: Callback<List<Product>?>{
-            override fun onResponse(call: Call<List<Product>?>, response: Response<List<Product>?>) {
+        call!!.enqueue(object: Callback<Product?>{
+            override fun onResponse(call: Call<Product?>, response: Response<Product?>) {
                 if(response.isSuccessful){
                     Log.e("mensaje","Se elimino correctamente")
                 }
             }
-
-            override fun onFailure(call: Call<List<Product>?>, t: Throwable) {
+            override fun onFailure(call: Call<Product?>, t: Throwable) {
                 Log.e("Error",t.message!!)
             }
-
         })
     }
 
@@ -688,7 +558,6 @@ class ProductFragment : Fragment() {
         }
         dialogo!!.show()
     }
-
 
     companion object {
         /**

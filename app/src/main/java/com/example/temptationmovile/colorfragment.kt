@@ -14,6 +14,7 @@ import android.widget.*
 import androidx.core.content.FileProvider
 import com.example.temptationmovile.databinding.ColorfragmentBinding
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.temptationmovile.adaptadores.AdaptadorColor
 import com.example.temptationmovile.clases.Color
 import com.example.temptationmovile.remoto.ApiUtil
@@ -28,135 +29,73 @@ import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [colorfragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class colorfragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private lateinit var txtcolor: EditText
-    private lateinit var chbestado: CheckBox
-    private lateinit var lblidcolor: TextView
-    private lateinit var btnregistrar_color: Button
-    private lateinit var btnactualizar_color: Button
-    private lateinit var btneliminar_color: Button
-    private lateinit var btnsalir_color: Button
-    private lateinit var lstcolor: ListView
 
-    //creamos un objeto de la clase categoria
-    val objcolor = Color()
-    //declaramos variables
-    private var cod = 0
-    private var nom = ""
-    private var est = 1
-    private var fila = -1
-
-    //declaramos el servicio
-    private var colorservice :ColorService?=null
-
-    //creamos arraylist de categoria
-    private var registrocolor:List<Color>?=null
-
-    //creamos un objeto de la clase utilidad
-    var objutilidad = Util()
-
-    //creamos transicion para fragmento
-    var ft: FragmentTransaction?= null
-
-    private var dialogo: AlertDialog.Builder? = null
-    private var _binding: ColorfragmentBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    private var _binding:ColorfragmentBinding?=null
     private val binding get() = _binding!!
+    private var colorservice :ColorService?=null
+    private var registrocolor:MutableList<Color>?=null
+    var objutilidad = Util()
+    private var fila:Int?=null
+    val objcolor = Color()
+    private lateinit var adaptadorColor: AdaptadorColor
+    private var llmanager:LinearLayoutManager?=null
+
+    var ft: FragmentTransaction?= null
+    private var dialogo: AlertDialog.Builder? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val raiz = inflater.inflate(R.layout.colorfragment, container, false)
-        //
-        txtcolor = raiz.findViewById(R.id.txtcolor)
-        chbestado = raiz.findViewById(R.id.chkStateColor)
-        lblidcolor = raiz.findViewById(R.id.lblidcolor)
-        btnregistrar_color = raiz.findViewById(R.id.btnregistrar_color)
-        btnactualizar_color = raiz.findViewById(R.id.btnactualizar_color)
-        btneliminar_color = raiz.findViewById(R.id.btneliminar_color)
-        lstcolor = raiz.findViewById(R.id.lstcolor)
-        lstcolor.isNestedScrollingEnabled = true
-
-        //
+        _binding = ColorfragmentBinding.inflate(inflater, container, false)
+        var context=binding.root.context
+        llmanager= LinearLayoutManager(context)
         registrocolor = ArrayList()
-
-        //
         colorservice =ApiUtil.colorservice
+        mostrarColor(context)
 
-        //
-        mostrarColor(raiz.context)
-
-        //
-        btnregistrar_color.setOnClickListener {
-            if(txtcolor.getText().toString()==""){
-                objutilidad.MensajeToast(raiz.context,"Ingrese el color")
-                txtcolor.requestFocus()
+        binding.btnregistrarColor.setOnClickListener {
+            if(binding.txtcolor.getText().toString()==""){
+                objutilidad.MensajeToast(context,"Ingrese el color")
+                binding.txtcolor.requestFocus()
             }else{
                 //capturando valores
-                nom = txtcolor.getText().toString()
-                est = if(chbestado.isChecked){
+                var est = if(binding.chkStateColor.isChecked){
                     1
                 }else{
                     0
                 }
                 //enviamos los valores a la clase
-                objcolor.name_col = nom
+                objcolor.name_col = binding.txtcolor.text.toString()
                 objcolor.state = est
-                registrarColor(raiz.context,objcolor)
+                registrarColor(context,objcolor)
                 DialogoCRUD("Registro de Color","Se registró el nuevo Color correctamente"
                 ,colorfragment())
             }
         }
 
-        btnactualizar_color.setOnClickListener {
-            if (fila >= 0) {
-                cod = lblidcolor.getText().toString().toInt()
-                nom = txtcolor.getText().toString()
-                est = if (chbestado.isChecked) {
+        binding.btnactualizarColor.setOnClickListener {
+            if (fila !=null) {
+                var est = if (binding.chkStateColor.isChecked) {
                     1
                 } else {
                     0
                 }
-                objcolor.idcolor = cod
-                objcolor.name_col = nom
+                objcolor.idcolor = binding.lblidcolor.getText().toString().toInt()
+                objcolor.name_col = binding.txtcolor.text.toString()
                 objcolor.state = est
-                actualizarColor(raiz.context, objcolor, cod.toLong())
-                //objutilidad.limpiar(raiz.findViewById<View>(R.id.frmCategoria) as ViewGroup)
+                actualizarColor(context, objcolor, objcolor.idcolor.toLong())
                 val fcolor = colorfragment()
                 DialogoCRUD("Actualizacion del Color", "Se actualizo el color", fcolor)
             } else {
-                objutilidad.MensajeToast(raiz.context, "Seleccione un elemento de la lista")
-                lstcolor.requestFocus()
+                objutilidad.MensajeToast(context, "Seleccione un elemento de la lista")
+                binding.lstcolor.requestFocus()
             }
         }
 
-        btneliminar_color.setOnClickListener {
-            /*if (fila >= 0) {
-                cod = lblidcolor.getText().toString().toInt()
-                objcolor.idcolor = cod
-                eliminarColor(raiz.context, cod.toLong())
-                //objutilidad.limpiar(raiz.findViewById<View>(R.id.frmCategoria) as ViewGroup)
-                val fcolor = colorfragment()
-                DialogoCRUD("Eliminacion de Categoria", "Se elimino la categoria", fcolor)
-            } else {
-                objutilidad.MensajeToast(raiz.context, "Seleccione un elemento de la lista")
-                lstcolor.requestFocus()
-            }*/
+        binding.btneliminarColor.setOnClickListener {
             val document = Document(PageSize.A4,50f,50f,50f,50f)
             val fileName = "mi_lista_colores.pdf"
             val filePath = requireContext().getExternalFilesDirs(Environment.DIRECTORY_DOCUMENTS)?.get(0)?.absolutePath + "/" + fileName
@@ -169,7 +108,7 @@ class colorfragment : Fragment() {
             titleParagraph.alignment = Element.ALIGN_CENTER
             document.add(titleParagraph)
             document.add(Paragraph(""))
-            registrocolor=reporte()
+            registrocolor=reporte()as MutableList<Color>
             var tabla = PdfPTable(3)
             tabla.addCell("ID")
             tabla.addCell("Color")
@@ -196,25 +135,30 @@ class colorfragment : Fragment() {
             if (openPdfIntent.resolveActivity(requireActivity().packageManager) != null) {
                 startActivity(intentChooser)
             }
-
-
         }
-
-        lstcolor.setOnItemClickListener(
-            { adapterView, view,i, id ->
-                fila = i
-                //asignamos los valores a cada control
-                lblidcolor.setText(""+(registrocolor as ArrayList<Color>).get(fila).idcolor)
-                txtcolor.setText(""+(registrocolor as ArrayList<Color>).get(fila).name_col)
-                if((registrocolor as ArrayList<Color>).get(fila).state != 0){
-                    chbestado.setChecked(true)
-                }else{
-                    chbestado.setChecked(false)
-                }
-
-            }
-        )
-        return raiz
+        return binding.root
+    }
+    fun onClickListener(col:Color,pos:Int){
+        fila=pos
+        binding.lblidcolor.text=col.idcolor.toString()
+        binding.txtcolor.setText(col.name_col.toString())
+        if (col.state==1) {
+            binding.chkStateColor.setChecked(true)
+        }else {
+            binding.chkStateColor.setChecked(false)
+        }
+    }
+    fun onClickDeleteChangued(pos:Int,col:Color){
+        if (col.state==1) {
+            eliminarColor(binding.root.context, col.idcolor.toLong())
+            DialogoCRUD("Marca Deshabilitado","Se deshabilito el estado de la Marca "+col.name_col,colorfragment())
+            //llmanager!!.scrollToPositionWithOffset(pos,10)
+        }else{
+            col.state=1
+            actualizarColor(binding.root.context,col,col.idcolor.toLong())
+            DialogoCRUD("Marca Habilitado","Se habilitó el estado de la Marca"+col.name_col,colorfragment())
+            //llmanager!!.scrollToPositionWithOffset(pos,10)
+        }
     }
 
     fun reporte():List<Color>{
@@ -225,7 +169,7 @@ class colorfragment : Fragment() {
                 response: Response<List<Color>?>)
             {
                 if(response.isSuccessful){
-                    registrocolor = response.body()
+                    registrocolor = response.body() as MutableList<Color>
                 }
             }
             override fun onFailure(call: Call<List<Color>?>, t: Throwable) {
@@ -243,8 +187,12 @@ class colorfragment : Fragment() {
                 response: Response<List<Color>?>)
             {
                 if(response.isSuccessful){
-                    registrocolor = response.body()
-                    lstcolor.adapter = AdaptadorColor(contex,registrocolor)
+                    registrocolor = response.body() as MutableList<Color>
+                    adaptadorColor = AdaptadorColor(lista=registrocolor!!,
+                        onClickListener={b,pos->onClickListener(b,pos)},
+                        onClickDeleteChangued={del,bra->onClickDeleteChangued(del,bra)})
+                    binding.lstcolor.layoutManager=llmanager
+                    binding.lstcolor.adapter=adaptadorColor
                 }
             }
             override fun onFailure(call: Call<List<Color>?>, t: Throwable) {
@@ -271,30 +219,29 @@ class colorfragment : Fragment() {
 
     fun actualizarColor(context:Context,co: Color,id:Long){
         val call = colorservice!!.ActualizarColor(id,co)
-        call!!.enqueue(object:Callback<List<Color>?>{
-            override fun onResponse(call: Call<List<Color>?>, response: Response<List<Color>?>) {
-                if(response.isSuccessful){
+        call!!.enqueue(object:Callback<Color?>{
+            override fun onResponse(call: Call<Color?>, response: Response<Color?>) {
+                if(response!!.isSuccessful){
                     Log.e("mensaje", "Se actualizo correctamente")
+                    fila=null
                 }
             }
-
-            override fun onFailure(call: Call<List<Color>?>, t: Throwable) {
+            override fun onFailure(call: Call<Color?>, t: Throwable) {
                 Log.e("Error: ", t.message!!)
             }
-
         })
     }
 
     fun eliminarColor(context:Context,id:Long){
         val call = colorservice!!.EliminarColor(id)
-        call!!.enqueue(object:Callback<List<Color>?>{
-            override fun onResponse(call: Call<List<Color>?>, response: Response<List<Color>?>) {
+        call!!.enqueue(object:Callback<Color?>{
+            override fun onResponse(call: Call<Color?>, response: Response<Color?>) {
                 if(response.isSuccessful){
                     Log.e("mensaje","Se elimino correctamente")
                 }
             }
 
-            override fun onFailure(call: Call<List<Color>?>, t: Throwable) {
+            override fun onFailure(call: Call<Color?>, t: Throwable) {
                 Log.e("Error: ", t.message!!)
             }
 

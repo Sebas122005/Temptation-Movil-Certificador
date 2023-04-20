@@ -9,8 +9,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import androidx.core.content.ContextCompat
 import com.example.temptationmovile.clases.Brand
 import androidx.fragment.app.FragmentTransaction
 import com.example.temptationmovile.adaptadores.Adaptadorbrand
@@ -22,12 +20,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.FileOutputStream
-import androidx.core.content.ContextCompat.getExternalFilesDirs
 import android.os.Environment
-import android.net.Uri
 import java.io.File
-import android.content.pm.PackageManager
-import android.graphics.fonts.FontFamily
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.itextpdf.text.*
@@ -77,7 +71,7 @@ class brandFragmene : Fragment() {
                     "Se registró la marca correctamente",
                     brandFragmene()
                 )
-                llmanager!!.scrollToPositionWithOffset(registrobrand!!.size,10)
+                //llmanager!!.scrollToPositionWithOffset(registrobrand!!.size,10)
             }
         }
 
@@ -91,6 +85,7 @@ class brandFragmene : Fragment() {
                 DialogoCRUD("Actualizacion de la Marca", "Se actualizó la Marca",fbramd)
                 llmanager!!.scrollToPositionWithOffset(fila!!.toInt(),10)
             }else{
+                objutilidad.MensajeToast(context, "Seleccione un elemento de la lista")
                 binding.lstbrand.requestFocus()
             }
         }
@@ -169,7 +164,7 @@ class brandFragmene : Fragment() {
             ) {
                 if(response.isSuccessful){
                     registrobrand = response.body() as MutableList<Brand>?
-                    adapterBrand= Adaptadorbrand(listbrand=registrobrand!!,
+                    adapterBrand= Adaptadorbrand(lista=registrobrand!!,
                         onClickListener={b,pos->onClickListener(b,pos)},
                         onClickDeleteChangued={del,bra->onClickDeleteChangued(del,bra)})
                     binding.lstbrand.layoutManager=llmanager
@@ -200,10 +195,11 @@ class brandFragmene : Fragment() {
         }else{
             brand.state=1
             ActualizarBrand(binding.root.context,brand,brand.idbrand.toLong())
-            DialogoCRUD("Marca Habilitado","Se habilitó el estado de la Marca"+brand.name_brand,brandFragmene())
+            DialogoCRUD("Marca Habilitado","Se habilitó el estado de la Marca "+brand.name_brand,brandFragmene())
             //llmanager!!.scrollToPositionWithOffset(pos,10)
         }
     }
+
     fun registrarbrand(context: Context, c:Brand){
         val call = brandservice!!.RegistrarBrand(c)
         call!!.enqueue(object :Callback<Brand?>{
@@ -225,6 +221,7 @@ class brandFragmene : Fragment() {
             override fun onResponse(call: Call<Brand?>, response: Response<Brand?>) {
                 if(response.isSuccessful){
                     Log.e("Mensaje", "Se actualizo correctamente")
+                    fila=null
                 }
             }
             override fun onFailure(call: Call<Brand?>, t: Throwable) {

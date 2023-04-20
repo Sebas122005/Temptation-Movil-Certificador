@@ -128,7 +128,7 @@
                 android:text="IR A DETALLE" />
 
             <Button
-                android:id="@+id/btnsalirincome"
+                android:id="@+id/btnGenerarReporteincome"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_margin="3dp"

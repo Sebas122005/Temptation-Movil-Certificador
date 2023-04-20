@@ -13,15 +13,19 @@ import android.widget.Button
 import android.widget.ListView
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.temptationmovile.adaptadores.AdaptadorComboProvider
 import com.example.temptationmovile.adaptadores.AdaptadorIncome
+import com.example.temptationmovile.clases.Brand
 import com.example.temptationmovile.clases.Income
 import com.example.temptationmovile.clases.Product
 import com.example.temptationmovile.clases.Provider
+import com.example.temptationmovile.databinding.FragmentIncomeBinding
 import com.example.temptationmovile.remoto.ApiUtil
 import com.example.temptationmovile.servicios.IncomeService
 import com.example.temptationmovile.servicios.ProviderService
@@ -49,30 +53,19 @@ private const val ARG_PARAM2 = "param2"
  */
 class incomeFragment : Fragment() {
     // TODO: Rename and change types of parameters
-    private lateinit var cboprovider : Spinner
-    private lateinit var btnregistroinco : Button
-    private lateinit var btnsalirincome : Button
-    private lateinit var btndeta_income : Button
-    private lateinit var txtfechainco : TextView
-    private lateinit var lstinco : ListView
-    private lateinit var bnGenerarCotizacion:Button
-
-    private val objprovider = Provider()
-
-    private val objIncome = Income()
-    private var fechaincome = ""
-    private var state = 1
-    private var idProvider= 0
-    private var codProvider= 0
-
-    private var indiceP=0
-    private var fila = -1
-
+    private var listener:OnFragmentInteractionListener?=null
+    private var _binding:FragmentIncomeBinding?=null
+    private val binding get() = _binding!!
+    private lateinit var adapterIncome: AdaptadorIncome
+    private var llmanager: LinearLayoutManager?=null
     private var providerService: ProviderService?=null
     private var incomeService: IncomeService?=null
 
-    private var registroIncome: List<Income>? = null
+    private var registroIncome: MutableList<Income>? = null
     private var registroProvider: List<Provider>? = null
+
+    private val objprovider = Provider()
+    private val objIncome = Income()
 
     private var fecha = Calendar.getInstance().time
     private val formatoFecha = SimpleDateFormat("dd/MM/yyyy")
@@ -82,61 +75,46 @@ class incomeFragment : Fragment() {
     var objutilidad =  Util()
     private var dialogo: AlertDialog.Builder? = null
     var ft: FragmentTransaction?= null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-
-        }
-    }
-
+    private var fila:Int?=null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val context=requireContext()
-        // Inflate the layout for this fragment
-        val raiz = inflater.inflate(R.layout.fragment_income, container, false)
-        txtfechainco = raiz.findViewById(R.id.txtfechacomprainco)
-        cboprovider = raiz.findViewById(R.id.cboprovidersincome)
-        btnsalirincome = raiz.findViewById(R.id.btnsalirincome)
-        btnregistroinco = raiz.findViewById(R.id.btnregistrarincome)
-        btndeta_income = raiz.findViewById(R.id.btndeta_inco)
-        lstinco = raiz.findViewById(R.id.lstincome)
-        bnGenerarCotizacion = raiz.findViewById(R.id.bnGenerarCotizacion)
+        _binding = FragmentIncomeBinding.inflate(inflater, container, false)
+        var context = binding.root.context
         registroIncome = ArrayList()
         registroProvider = ArrayList()
+        llmanager= LinearLayoutManager(context)
         providerService = ApiUtil.providerService
         incomeService = ApiUtil.incomeService
-        lstinco.isNestedScrollingEnabled = true
 
-        mostrarComboProvider(raiz.context)
-        mostrarincome(raiz.context)
+        mostrarComboProvider(context)
+        mostrarincome(context)
 
-        txtfechainco.setText(fechaAct)
+        binding.txtfechacomprainco.setText(fechaAct)
 
-        btnregistroinco.setOnClickListener {
-            if(cboprovider.selectedItemPosition==-1){
-                objutilidad.MensajeToast(raiz.context,"Seleccionne un Proveedor")
-                cboprovider.requestFocus()
-            }else if(txtfechainco.text.toString() == "") {
-                objutilidad.MensajeToast(raiz.context, "Ingresa la fecha")
-                txtfechainco.requestFocus()
+        binding.btnregistrarincome.setOnClickListener {
+            if(binding.cboprovidersincome.selectedItemPosition==-1){
+                objutilidad.MensajeToast(context,"Seleccionne un Proveedor")
+                binding.cboprovidersincome.requestFocus()
             }else{
-                //fechaincome=txtfechainco.text.toString()
                 fechita = fechaAct
-                idProvider = cboprovider.selectedItemPosition
-                codProvider = (registroProvider as ArrayList<Provider>).get(idProvider).idprovider
+                objIncome.idprovider=(registroProvider as ArrayList<Provider>).get(binding.cboprovidersincome.selectedItemPosition).idprovider
+                objIncome.dateinco=fechaAct
 
-                objIncome.idprovider=codProvider
-                objIncome.dateinco=fechita
-
-                registroIncome(raiz.context,objIncome)
+                registroIncome(context,objIncome)
                 val fincome = incomeFragment()
-                DialogoCRUD("Registro de Producto", "Se registro la Compra Correctamente",fincome)
+                DialogoCRUD("Registro de Compra", "Se registro la Compra Correctamente",fincome)
             }
         }
-        btnsalirincome.setOnClickListener {
+        binding.btndetaInco.setOnClickListener {
+            val fra = DetailIncomeFragment()
+            ft = fragmentManager?.beginTransaction()
+            ft?.replace(R.id.contenedor, fra, null)
+            ft?.addToBackStack(null)
+            ft?.commit()
+        }
+        binding.btnGenerarReporteincome.setOnClickListener {
             val document = Document(PageSize.A4,50f,50f,50f,50f)
             val fileName = "mi_lista_compra.pdf"
             val filePath = requireContext().getExternalFilesDirs(Environment.DIRECTORY_DOCUMENTS)?.get(0)?.absolutePath + "/" + fileName
@@ -149,7 +127,7 @@ class incomeFragment : Fragment() {
             titleParagraph.alignment = Element.ALIGN_CENTER
             document.add(titleParagraph)
             document.add(Paragraph(""))
-            registroIncome=reporte()
+            registroIncome=reporte() as MutableList<Income>
             var tabla = PdfPTable(4)
             tabla.addCell("ID Compra")
             tabla.addCell("Proveedor")
@@ -180,47 +158,15 @@ class incomeFragment : Fragment() {
                 startActivity(intentChooser)
             }
         }
-        btndeta_income.setOnClickListener {
-            val fra = DetailIncomeFragment()
-            ft = fragmentManager?.beginTransaction()
-            ft?.replace(R.id.contenedor, fra, null)
-            ft?.addToBackStack(null)
-            ft?.commit()
-        }
 
-        lstinco.setOnItemClickListener { adapterView, view, i, l ->
-            fila = i
-
-            txtfechainco.setText(""+ (registroIncome as ArrayList<Income>).get(fila).dateinco.toString())
-            for (x in (registroProvider as ArrayList<Provider>).indices){
-                if((registroProvider as ArrayList<Provider>).get(x).idprovider == (registroIncome as ArrayList<Income>).get(fila).idprovider){
-                    indiceP = x
-                }
-            }
-            cboprovider.setSelection(indiceP)
-
-        }
-        bnGenerarCotizacion.setOnClickListener {
+        binding.bnGenerarCotizacion.setOnClickListener {
             val fra = GenerarCotizacionFragment()
             ft = fragmentManager?.beginTransaction()
             ft?.replace(R.id.contenedor, fra, null)
             ft?.addToBackStack(null)
             ft?.commit()
         }
-
-        /*btnregistroinco.setOnClickListener {
-            if(fila>=0){
-                fechaincome = txtfechainco.text.toString()
-
-                objIncome.
-
-            }
-        }*/
-
-
-
-        return raiz
-        //return inflater.inflate(R.layout.fragment_income, container, false)
+        return binding.root
     }
 
     fun mostrarComboProvider(context: Context){
@@ -229,7 +175,7 @@ class incomeFragment : Fragment() {
             override fun onResponse(call: Call<List<Provider>?>, response: Response<List<Provider>?>) {
                 if(response.isSuccessful){
                     registroProvider = response.body()
-                    cboprovider.adapter = AdaptadorComboProvider(context, registroProvider)
+                    binding.cboprovidersincome.adapter = AdaptadorComboProvider(context, registroProvider)
                 }
             }
 
@@ -239,8 +185,6 @@ class incomeFragment : Fragment() {
 
         })
     }
-
-
 
     fun registroIncome(context: Context, p: Income){
         val call = incomeService!!.RegistrarIncome(p)
@@ -263,12 +207,11 @@ class incomeFragment : Fragment() {
             override fun onResponse(call: Call<List<Income>>, response: Response<List<Income>>) {
                 if(response.isSuccessful){
                     println("Correcto")
-                    registroIncome = response.body()
+                    registroIncome = response.body() as MutableList<Income>?
                 }else{
                     println("Error")
                 }
             }
-
             override fun onFailure(call: Call<List<Income>>, t: Throwable) {
                 Log.e("Error: ", t.message.toString())
             }
@@ -276,7 +219,25 @@ class incomeFragment : Fragment() {
         })
         return registroIncome!!
     }
+    interface OnFragmentInteractionListener{
+        fun onFragmentInteraction(texto:Int)
+    }
 
+    fun onClickListener(brand: Income, pos: Int) {
+        dialogo = AlertDialog.Builder(context)
+        dialogo!!.setTitle("Registrar Detalle")
+        dialogo!!.setMessage("Desea registrar detalle de esta Compra?")
+        dialogo!!.setCancelable(true)
+        dialogo!!.setPositiveButton("Ok") { dialogo, which ->
+            listener?.onFragmentInteraction(brand.idincome)
+            val fra = DetailIncomeFragment()
+            ft = fragmentManager?.beginTransaction()
+            ft?.replace(R.id.contenedor, fra, null)
+            ft?.addToBackStack(null)
+            ft?.commit()
+        }
+        dialogo!!.show()
+    }
 
     fun mostrarincome(context: Context){
         val call = incomeService!!.MostrarIncomes()
@@ -284,8 +245,10 @@ class incomeFragment : Fragment() {
             override fun onResponse(call: Call<List<Income>>, response: Response<List<Income>>) {
                 if(response.isSuccessful){
                     println("Correcto")
-                    registroIncome = response.body()
-                    lstinco.adapter = AdaptadorIncome(context, registroIncome!!)
+                    registroIncome = response.body() as MutableList<Income>
+                    adapterIncome = AdaptadorIncome(registroIncome!!, ({er,pos->onClickListener(er,pos)}))
+                    binding.lstincome.layoutManager=llmanager
+                    binding.lstincome.adapter=adapterIncome
                 }else{
                     println("Error")
                 }
@@ -313,7 +276,18 @@ class incomeFragment : Fragment() {
         }
         dialogo!!.show()
     }
-
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnFragmentInteractionListener){
+            listener=context
+        }else{
+            throw java.lang.RuntimeException(context.toString() + "must implement OnFragmentInteractionListener")
+        }
+    }
+    override fun onDetach() {
+        super.onDetach()
+        listener=null
+    }
     companion object {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =

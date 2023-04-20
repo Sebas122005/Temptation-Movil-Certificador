@@ -14,9 +14,9 @@ interface CategoryService {
     fun RegistrarCategory(@Body b: Category): Call<Category>?
 
     @PUT("category/{idcat}")
-    fun ActualizarCategory(@Path("idcat") id: Long, @Body b: Category): Call<List<Category>?>?
+    fun ActualizarCategory(@Path("idcat") id: Long, @Body b: Category): Call<Category>?
 
 
     @DELETE("category/{idcat}")
-    fun EliminarCategory(@Path("idcat") id: Long ): Call<List<Category>?>?
+    fun EliminarCategory(@Path("idcat") id: Long ): Call<Category>?
 }

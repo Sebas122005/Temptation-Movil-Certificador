@@ -11,9 +11,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.temptationmovile.adaptadores.AdaptadorProvider
 import com.example.temptationmovile.clases.*
 import com.example.temptationmovile.databinding.BrandFragmentBinding
+import com.example.temptationmovile.databinding.FragmentProvidersBinding
 import com.example.temptationmovile.remoto.ApiUtil
 import com.example.temptationmovile.servicios.ProviderService
 import com.example.temptationmovile.utilidad.Util
@@ -33,195 +35,118 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class ProvidersFragment : Fragment() {
-    private lateinit var txt_Nomb: EditText
-    private lateinit var chb_Est: CheckBox
-    private lateinit var lbl_CodProv: TextView
-    private lateinit var btn_Registrar: Button
-    private lateinit var btn_Actualizar: Button
-    private lateinit var btn_Eliminar: Button
-    private lateinit var btn_Salir: Button
-    private lateinit var txt_RucProv: EditText
-    private lateinit var txt_EmpresaProv: EditText
-    private lateinit var txt_TelefonoProv: EditText
-    private lateinit var txt_EmailProv: EditText
-    private lateinit var txt_DescripcionPro: EditText
-    private lateinit var txt_DireccionProv: EditText
-    private lateinit var lst_Provider: ListView
-
-
+    private var _binding:FragmentProvidersBinding?=null
+    private val binding get() = _binding!!
+    private lateinit var adaptadorProvider: AdaptadorProvider
+    private var llmanager:LinearLayoutManager?=null
     val objprob = Provider()
-    private var idprovider=0
-    private var name_prov=""
-    private var ruc=""
-    private var company_name=""
-    private var phone=0
-    private var email=""
-    private var description=""
-    private var address=""
-    private var state=1
-    private var fila =-1
+    private var fila:Int?=null
 
-    private lateinit var binding: ProvidersFragment
     private var providerservice: ProviderService? = null
-    private var registroprovider: List<Provider>?=null
+    private var registroprovider: MutableList<Provider>?=null
+
     var objutilidad =  Util()
     private var dialogo: AlertDialog.Builder? = null
-
-    //creamos transicion para fragmento
     var ft: FragmentTransaction?= null
-    private var _binding: BrandFragmentBinding? = null
 
-    /*override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }*/
-
-    @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         //return inflater.inflate(R.layout.fragment_provider, container, false)
-        val raiz=inflater.inflate(R.layout.fragment_providers,container,false)
+        _binding=FragmentProvidersBinding.inflate(inflater,container,false)
         //creamos los controles
-        txt_Nomb=raiz.findViewById(R.id.txtnombreprov1)
-        chb_Est=raiz.findViewById(R.id.chbprovider1)
-        lbl_CodProv=raiz.findViewById(R.id.lblidprovider)
-        btn_Registrar=raiz.findViewById(R.id.btnregistrarprov)
-        btn_Actualizar=raiz.findViewById(R.id.btnactualizarprov)
-        btn_Eliminar=raiz.findViewById(R.id.btneliminarprov)
-        lst_Provider=raiz.findViewById(R.id.lstlistarprovider)
-        txt_DescripcionPro=raiz.findViewById(R.id.txtdescription_prov)
-        txt_DireccionProv=raiz.findViewById(R.id.txtdireccion_prov)
-        txt_EmailProv=raiz.findViewById(R.id.txtemail_prov)
-        txt_EmpresaProv=raiz.findViewById(R.id.txtempresa_prov)
-        txt_RucProv=raiz.findViewById(R.id.txtrucprov)
-        txt_TelefonoProv=raiz.findViewById(R.id.txtphone_prov)
-        lst_Provider.isNestedScrollingEnabled = true
-
+        var context=binding.root.context
+        llmanager=LinearLayoutManager(context)
 
         registroprovider = ArrayList()
-
         providerservice = ApiUtil.providerService
 
+        mostrarProvider(context)
 
-        mostrarProvider(raiz.context)
-
-        btn_Registrar.setOnClickListener {
-            if (txt_Nomb.getText().toString() == "") {
-                objutilidad.MensajeToast(raiz.context, "Ingrese el Nombre")
-                txt_Nomb.requestFocus()
+        binding.btnregistrarprov.setOnClickListener {
+            if (binding.txtnombreprov1.getText().toString() == "") {
+                objutilidad.MensajeToast(context, "Ingrese el Nombre")
+                binding.txtnombreprov1.requestFocus()
             } else {
-                name_prov = txt_Nomb.getText().toString()
-                ruc = txt_RucProv.getText().toString()
-                company_name = txt_EmpresaProv.getText().toString()
-                phone = txt_TelefonoProv.getText().toString().toInt()
-                email= txt_EmailProv.getText().toString()
-                description= txt_DescripcionPro.getText().toString()
-                address= txt_DireccionProv.getText().toString()
-                state = if (chb_Est.isChecked) 1 else 0
                 //envienadoo los valores
-                objprob.name_prov = name_prov
-                objprob.ruc=ruc
-                objprob.address=address
-                objprob.company_name=company_name
-                objprob.phone=phone
-                objprob.email=email
-                objprob.description=description
-                objprob.state = state
-                //Log.e(objprob.name_prov, (objprob.state).toString())
-                registrar(raiz.context, objprob)
-                //Log.e(objprob.name_prov, (objprob.state).toString())
-
-                //actualizamos el brand
-                val fprov = ProvidersFragment()
-                ft = fragmentManager?.beginTransaction()
-                ft?.replace(R.id.contenedor,fprov,null)
-                ft?.addToBackStack(null)
-                ft?.commit()
+                objprob.name_prov = binding.txtnombreprov1.text.toString()
+                objprob.ruc=binding.txtrucprov.text.toString()
+                objprob.address=binding.txtdireccionProv.text.toString()
+                objprob.company_name=binding.txtempresaProv.text.toString()
+                objprob.phone=binding.txtphoneProv.text.toString().toInt()
+                objprob.email=binding.txtemailProv.text.toString()
+                objprob.description=binding.txtdescriptionProv.text.toString()
+                objprob.state = if (binding.chbprovider1.isChecked) 1 else 0
+                registrar(context, objprob)
+                DialogoCRUD("Registro de Proveedor","Se registro el proveedor",ProvidersFragment())
             }
         }
 
-        lst_Provider.setOnItemClickListener(
-            { adapterView, view,i, id ->
-                fila = i
-                //asignamos los valores a cada control
-                lbl_CodProv.setText(""+(registroprovider as ArrayList<Provider>).get(fila).idprovider)
-                txt_Nomb.setText(""+(registroprovider as ArrayList<Provider>).get(fila).name_prov)
-                txt_DescripcionPro.setText(""+(registroprovider as ArrayList<Provider>).get(fila).description)
-                txt_TelefonoProv.setText(""+(registroprovider as ArrayList<Provider>).get(fila).phone)
-                txt_EmailProv.setText(""+(registroprovider as ArrayList<Provider>).get(fila).email)
-                txt_RucProv.setText(""+(registroprovider as ArrayList<Provider>).get(fila).ruc)
-                txt_EmpresaProv.setText(""+(registroprovider as ArrayList<Provider>).get(fila).company_name)
-                txt_DireccionProv.setText(""+(registroprovider as ArrayList<Provider>).get(fila).address)
 
-
-                if((registroprovider as ArrayList<Provider>).get(fila).state != 0){
-                    chb_Est.setChecked(true)
-                }else{
-                    chb_Est.setChecked(false)
-                }
-
-            }
-        )
-
-        btn_Eliminar.setOnClickListener {
-            if(fila>=0){
-                idprovider = lbl_CodProv.text.toString().toInt()
-
-
-                EliminarProduct(raiz.context,idprovider.toLong())
+        binding.btneliminarprov.setOnClickListener {
+            if(fila!=null){
+                EliminarProduct(context,binding.lblidprovider.text.toString().toLong())
                 val fprovider = ProvidersFragment()
-                DialogoCRUDEliminar("¿Eliminar el Producto?", "¿Desea Eliminar el Producto?",fprovider)
-
+                DialogoCRUD("Se Deshabilito  del Proveedor", "Se Cambio el estado a deshabilitado del proveedor ",fprovider)
             }else{
-                objutilidad.MensajeToast(raiz.context,"Seleccione un elemento de la lista")
-                lst_Provider.requestFocus()
+                objutilidad.MensajeToast(context,"Seleccione un elemento de la lista")
+                binding.lstlistarprovider.requestFocus()
             }
         }
 
-        btn_Actualizar.setOnClickListener {
-            if(fila >=0){
-                idprovider = lbl_CodProv.text.toString().toInt()
-                name_prov =txt_Nomb.text.toString()
-                ruc = txt_RucProv.text.toString()
-                company_name = txt_EmpresaProv.text.toString()
-                phone = txt_TelefonoProv.text.toString().toInt()
-                email = txt_EmailProv.text.toString()
-                description = txt_DescripcionPro.text.toString()
-                address = txt_DireccionProv.text.toString()
-                state = if (chb_Est.isChecked) 1 else 0
-
-
-
-                objprob.idprovider = idprovider
-                objprob.name_prov = name_prov
-                objprob.ruc = ruc
-                objprob.company_name = company_name
-                objprob.phone = phone
-                objprob.email = email
-                objprob.description = description
-                objprob.address = address
-                objprob.state = state
-                ActualizarProvider(raiz.context,objprob,idprovider.toLong())
+        binding.btnactualizarprov.setOnClickListener {
+            if(fila !=null){
+                objprob.name_prov = binding.txtnombreprov1.text.toString()
+                objprob.ruc=binding.txtrucprov.text.toString()
+                objprob.address=binding.txtdireccionProv.text.toString()
+                objprob.company_name=binding.txtempresaProv.text.toString()
+                objprob.phone=binding.txtphoneProv.text.toString().toInt()
+                objprob.email=binding.txtemailProv.text.toString()
+                objprob.description=binding.txtdescriptionProv.text.toString()
+                objprob.state = if (binding.chbprovider1.isChecked) 1 else 0
+                objprob.idprovider=binding.lblidprovider.text.toString().toInt()
+                ActualizarProvider(context,objprob,objprob.idprovider.toLong())
                 val fprovider = ProvidersFragment()
-                DialogoCRUDEliminar("Actualizacion de Proveedor", "¿Quiere Actualizar el Proveedor?",fprovider)
+                DialogoCRUD("Actualización de Proveedor", "Se actualizo el proveedor correctamente",fprovider)
             }else{
-                objutilidad.MensajeToast(raiz.context,"Seleccione un elemento de la lista")
-                lst_Provider.requestFocus()
+                objutilidad.MensajeToast(context,"Seleccione un elemento de la lista")
+                binding.lstlistarprovider.requestFocus()
             }
         }
 
 
-        return raiz
+        return binding.root
 
 
     }
 
+    fun onClickListener(prov:Provider,pos:Int){
+        binding.txtdescriptionProv.setText(prov.description.toString())
+        binding.txtnombreprov1.setText(prov.name_prov.toString())
+        binding.txtemailProv.setText(prov.email.toString())
+        binding.txtempresaProv.setText(prov.company_name.toString())
+        binding.txtphoneProv.setText(prov.phone.toString())
+        binding.txtrucprov.setText(prov.ruc.toString())
+        binding.txtdireccionProv.setText(prov.address.toString())
+        if (prov.state==1){
+            binding.chbprovider1.setChecked(true)
+        }else{
+            binding.chbprovider1.setChecked(false)
+        }
+        binding.lblidprovider.setText(prov.idprovider.toString())
+    }
+    fun onClickDeleteChangued(pos:Int,prov:Provider){
+        if (prov.state==1){
+            EliminarProduct(binding.root.context,prov.idprovider.toLong())
+            DialogoCRUD("Proveedor Deshabilitado","Se deshabilito el estado del proveedor  "+prov.name_prov,ProvidersFragment())
+        }else{
+            prov.state=1
+            ActualizarProvider(binding.root.context,prov,prov.idprovider.toLong())
+            DialogoCRUD("Proveedor Habilitado","Se habilitó el estado del proveedor "+prov.name_prov,ProvidersFragment())
+        }
+    }
     //CREAMOS LA FUNCION PARA MOSTRAR LAS CATEGORIAS
     fun mostrarProvider(context: Context){
         val call = providerservice!!.MostrarProvider()
@@ -231,15 +156,15 @@ class ProvidersFragment : Fragment() {
                 response: Response<List<Provider>?>
             ) {
                 if(response.isSuccessful){
-                    registroprovider = response.body()
-                    lst_Provider.adapter = AdaptadorProvider(context,registroprovider)
+                    registroprovider = response.body() as MutableList<Provider>
+                    adaptadorProvider = AdaptadorProvider(lista=registroprovider!!,
+                        onClickListener={b,pos->onClickListener(b,pos)},
+                        onClickDeleteChangued={del,bra->onClickDeleteChangued(del,bra)})
                 }
             }
-
             override fun onFailure(call: Call<List<Provider>?>, t: Throwable) {
                 Log.e("Error: ", t.message.toString())
             }
-
         })
     }
 
@@ -251,7 +176,6 @@ class ProvidersFragment : Fragment() {
                     objutilidad.MensajeToast(context, "Se registro al proveedor")
                 }
             }
-
             override fun onFailure(call: Call<Provider?>, t: Throwable) {
                 Log.e("Error: ", t.message!!)
             }
@@ -261,14 +185,15 @@ class ProvidersFragment : Fragment() {
 
     fun ActualizarProvider(context: Context, p:Provider, id: Long ){
         val call = providerservice!!.ActualizarProvider(id,p)
-        call!!.enqueue(object : Callback<List<Provider>?>{
-            override fun onResponse(call: Call<List<Provider>?>, response: Response<List<Provider>?>) {
+        call!!.enqueue(object : Callback<Provider?>{
+            override fun onResponse(call: Call<Provider?>, response: Response<Provider?>) {
                 if(response.isSuccessful){
                     Log.e("Mensaje", "Se actualizo correctamente el Proveedor")
+                    fila=null
                 }
             }
 
-            override fun onFailure(call: Call<List<Provider>?>, t: Throwable) {
+            override fun onFailure(call: Call<Provider?>, t: Throwable) {
                 Log.e("Error: ",t.message!!)
             }
 
@@ -277,20 +202,33 @@ class ProvidersFragment : Fragment() {
 
     fun EliminarProduct(context: Context, id: Long){
         val call = providerservice!!.EliminarrProvider(id)
-        call!!.enqueue(object: Callback<List<Provider>?>{
-            override fun onResponse(call: Call<List<Provider>?>, response: Response<List<Provider>?>) {
+        call!!.enqueue(object: Callback<Provider?>{
+            override fun onResponse(call: Call<Provider?>, response: Response<Provider?>) {
                 if(response.isSuccessful){
                     Log.e("mensaje","Se elimino correctamente")
                 }
             }
 
-            override fun onFailure(call: Call<List<Provider>?>, t: Throwable) {
+            override fun onFailure(call: Call<Provider?>, t: Throwable) {
                 Log.e("Error",t.message!!)
             }
 
         })
     }
-
+    fun DialogoCRUD(titulo: String, mensaje: String, fragment: Fragment) {
+        dialogo = AlertDialog.Builder(context)
+        dialogo!!.setTitle(titulo)
+        dialogo!!.setMessage(mensaje)
+        dialogo!!.setCancelable(false)
+        dialogo!!.setPositiveButton("Ok") { dialogo, which ->
+            val fra = fragment
+            ft = fragmentManager?.beginTransaction()
+            ft?.replace(R.id.contenedor, fra, null)
+            ft?.addToBackStack(null)
+            ft?.commit()
+        }
+        dialogo!!.show()
+    }
     fun DialogoCRUDEliminar(titulo: String, mensaje: String, fragment: Fragment) {
         dialogo = AlertDialog.Builder(context)
         dialogo!!.setTitle(titulo)

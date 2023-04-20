@@ -14,9 +14,9 @@ interface SizeService {
     fun Registrarsize(@Body b: Size): Call<Size>?
 
     @PUT("size/{id}")
-    fun Actualizarsize(@Path("id") id: Long, @Body b: Size): Call<List<Size>?>?
+    fun Actualizarsize(@Path("id") id: Long, @Body b: Size): Call<Size>?
 
 
     @DELETE("size/{id}")
-    fun Eliminarrsize(@Path("id") id: Long ): Call<List<Size>?>?
+    fun Eliminarrsize(@Path("id") id: Long ): Call<Size>?
 }

@@ -18,8 +18,8 @@ interface IncomeService {
     fun RegistrarIncome(@Body p: Income): Call<Income>
 
     @PUT("income/{idincome}")
-    fun ActualizarIncome(@Path("idincome") id: Long, @Body p: Income): Call<List<Income>?>?
+    fun ActualizarIncome(@Path("idincome") id: Long, @Body p: Income): Call<Income>?
 
     @DELETE("income/{idincome}")
-    fun EliminarIncome(@Path("idincome") id:Long): Call<List<Income>?>?
+    fun EliminarIncome(@Path("idincome") id:Long): Call<Income>?
 }

@@ -18,10 +18,10 @@ interface RolService {
     @POST("role")
     fun RegistrarRol(@Body r:Rol):Call<Rol>?
     @PUT("role/{id}")
-    fun ActualizarRol(@Path("id")id:Long,@Body r: Rol):Call<List<Rol>?>?
+    fun ActualizarRol(@Path("id")id:Long,@Body r: Rol):Call<Rol>?
 
     @DELETE("role/{id}")
-    fun EliminarRol(@Path("id")id: Long):Call<List<Rol>?>?
+    fun EliminarRol(@Path("id")id: Long):Call<Rol>?
 
 
 

@@ -14,7 +14,7 @@ import com.example.temptationmovile.clases.Product
 import com.example.temptationmovile.viewHolder.BrandViewHolder
 import com.example.temptationmovile.viewHolder.OutputViewHolder
 
-class AdaptadorOutput(private val lista: List<Output>?, val onClickListener: (Output, Int)->Unit):
+class AdaptadorOutput(private val lista: List<Output>?, val onClickListener: (Output, Int)->Unit,val onClickDeleteChangued:(Int,Output)->Unit):
     RecyclerView.Adapter<OutputViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OutputViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -27,7 +27,7 @@ class AdaptadorOutput(private val lista: List<Output>?, val onClickListener: (Ou
 
     override fun onBindViewHolder(holder: OutputViewHolder, position: Int) {
         val item = lista!![position]
-        holder.render(item,onClickListener)
+        holder.render(item,onClickListener,onClickDeleteChangued)
     }
 
 }

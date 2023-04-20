@@ -326,7 +326,7 @@
                 android:typeface="serif"
                 android:text="ACTUALIZAR"/>
 
-            <Button
+            <!--<Button
                 android:id="@+id/btneliminar_person"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -338,7 +338,7 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textSize="15sp"
                 android:typeface="serif"
-                android:text="ELIMINAR" />
+                android:text="ELIMINAR" />-->
 
 
         </LinearLayout>

@@ -13,8 +13,8 @@ interface DetailIncomeService {
     fun RegistrarDetailIncome(@Body p: DetailIncome): Call<DetailIncome>?
 
     @PUT("detailincome/{iddetincome}")
-    fun ActualizarDetailIncome(@Path("iddetincome") id: Long, @Body p: DetailIncome): Call<List<DetailIncome>?>?
+    fun ActualizarDetailIncome(@Path("iddetincome") id: Long, @Body p: DetailIncome): Call<DetailIncome>?
 
     @DELETE("detailincome/{iddetincome}")
-    fun EliminarDetailIncome(@Path("iddetincome") id:Long): Call<List<DetailIncome>?>?
+    fun EliminarDetailIncome(@Path("iddetincome") id:Long): Call<DetailIncome>?
 }

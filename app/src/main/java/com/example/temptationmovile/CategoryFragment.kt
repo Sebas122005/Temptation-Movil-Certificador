@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.temptationmovile.adaptadores.AdaptadorCategory
 import com.example.temptationmovile.clases.Category
 import com.example.temptationmovile.databinding.CategoryFragmentBinding
@@ -29,129 +30,74 @@ import java.io.File
 import java.io.FileOutputStream
 
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [CategoryFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CategoryFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private lateinit var txtcat: EditText
-    private lateinit var chbestado: CheckBox
-    private lateinit var lblidcat: TextView
-    private lateinit var btnregistrar_cat: Button
-    private lateinit var btnactualizar_cat: Button
-    private lateinit var btneliminar_cat: Button
-    private lateinit var lstcat: ListView
 
-    val objcategory = Category()
-
-    //declaramos variables
-    private var cod = 0
-    private var nom = ""
-    private var est = 1
-    private var fila = -1
-
-    //
-    private var categoryService: CategoryService?=null
-    //
-    private var registroCategory:List<Category>?=null
-
-    var objutilidad = Util()
-
-    //creamos transicion para fragmento
-    var ft: FragmentTransaction?= null
-
-    private var dialogo: AlertDialog.Builder? = null
-
-    private var _binding: CategoryFragmentBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    private var _binding:CategoryFragmentBinding?=null
     private val binding get() = _binding!!
-
+    private var categoryService: CategoryService?=null
+    private var registroCategory:MutableList<Category>?=null
+    var objutilidad = Util()
+    private var fila:Int?=null
+    val objcategory = Category()
+    private lateinit var adapterCategory:AdaptadorCategory
+    private var llmanager:LinearLayoutManager?=null
+    var ft: FragmentTransaction?= null
+    private var dialogo: AlertDialog.Builder? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val raiz = inflater.inflate(R.layout.category_fragment, container, false)
+        _binding = CategoryFragmentBinding.inflate(inflater, container, false)
         //
-        txtcat = raiz.findViewById(R.id.txtcat)
-        chbestado = raiz.findViewById(R.id.chkStateCategory)
-        lblidcat = raiz.findViewById(R.id.lblidcat)
-        btnregistrar_cat = raiz.findViewById(R.id.btnregistrar_cat)
-        btnactualizar_cat = raiz.findViewById(R.id.btnactualizar_cat)
-        btneliminar_cat = raiz.findViewById(R.id.btneliminar_cat)
-        lstcat = raiz.findViewById(R.id.lstcat)
-        lstcat.isNestedScrollingEnabled = true
-
+        var context=binding.root.context
+        llmanager= LinearLayoutManager(context)
         registroCategory = ArrayList()
-
         categoryService = ApiUtil.categoryService
 
-        mostrarCategory(raiz.context)
+        mostrarCategory(context)
 
-        btnregistrar_cat.setOnClickListener {
-            if(txtcat.getText().toString()==""){
-                objutilidad.MensajeToast(raiz.context,"Ingrese el color")
-                txtcat.requestFocus()
+        binding.btnregistrarCat.setOnClickListener {
+            if(binding.txtcat.getText().toString()==""){
+                objutilidad.MensajeToast(context,"Ingrese la categoria")
+                binding.txtcat.requestFocus()
             }else{
-                nom = txtcat.getText().toString()
-                est = if(chbestado.isChecked){
+                var est = if(binding.chkStateCategory.isChecked){
                     1
                 }else{
                     0
                 }
-                objcategory.name_cat = nom
+                objcategory.name_cat = binding.txtcat.getText().toString()
                 objcategory.state = est
-                registrarCategory(raiz.context,objcategory)
+                registrarCategory(context,objcategory)
                 //
                 DialogoCRUD("Registro de Categoria","Se registró la nueva Categoria correctamente",
                 CategoryFragment())
             }
         }
 
-        btnactualizar_cat.setOnClickListener {
-            if (fila >= 0) {
-                cod = lblidcat.getText().toString().toInt()
-                nom = txtcat.getText().toString()
-                est = if (chbestado.isChecked) {
+        binding.btnactualizarCat.setOnClickListener {
+            if (fila != null) {
+                var est = if (binding.chkStateCategory.isChecked) {
                     1
                 } else {
                     0
                 }
-                objcategory.idcat = cod
-                objcategory.name_cat = nom
+                objcategory.idcat = binding.lblidcat.getText().toString().toInt()
+                objcategory.name_cat = binding.txtcat.text.toString()
                 objcategory.state = est
-                actualizarCategory(raiz.context, objcategory, cod.toLong())
+                actualizarCategory(context, objcategory, objcategory.idcat.toLong())
                 //objutilidad.limpiar(raiz.findViewById<View>(R.id.frmCategoria) as ViewGroup)
                 val fcategoria = CategoryFragment()
                 DialogoCRUD("Actualizacion de Categoria", "Se actualizo la categoria", fcategoria)
             } else {
-                objutilidad.MensajeToast(raiz.context, "Seleccione un elemento de la lista")
-                lstcat.requestFocus()
+                objutilidad.MensajeToast(context, "Seleccione un elemento de la lista")
+                binding.lstcat.requestFocus()
             }
         }
 
-        btneliminar_cat.setOnClickListener {
-            /*if (fila >= 0) {
-                cod = lblidcat.getText().toString().toInt()
-                objcategory.idcat = cod
-                eliminarCategory(raiz.context, cod.toLong())
-                //objutilidad.limpiar(raiz.findViewById<View>(R.id.frmCategoria) as ViewGroup)
-                val fcategoria = CategoryFragment()
-                DialogoCRUD("Eliminacion de Categoria", "Se elimino la categoria", fcategoria)
-            } else {
-                objutilidad.MensajeToast(raiz.context, "Seleccione un elemento de la lista")
-                lstcat.requestFocus()
-            }*/
+        binding.btneliminarCat.setOnClickListener {
             val document = Document(PageSize.A4,50f,50f,50f,50f)
             val fileName = "mi_lista_categoria.pdf"
             val filePath = requireContext().getExternalFilesDirs(Environment.DIRECTORY_DOCUMENTS)?.get(0)?.absolutePath + "/" + fileName
@@ -164,7 +110,7 @@ class CategoryFragment : Fragment() {
             titleParagraph.alignment = Element.ALIGN_CENTER
             document.add(titleParagraph)
             document.add(Paragraph(""))
-            registroCategory=reporte()
+            registroCategory=reporte() as MutableList<Category>?
             var tabla = PdfPTable(3)
             tabla.addCell("ID")
             tabla.addCell("Nombre de Categoria")
@@ -194,23 +140,31 @@ class CategoryFragment : Fragment() {
 
         }
 
-        lstcat.setOnItemClickListener(
-            { adapterView, view,i, id ->
-                fila = i
-                //asignamos los valores a cada control
-                lblidcat.setText(""+(registroCategory as ArrayList<Category>).get(fila).idcat)
-                txtcat.setText(""+(registroCategory as ArrayList<Category>).get(fila).name_cat)
-                if((registroCategory as ArrayList<Category>).get(fila).state != 0){
-                    chbestado.setChecked(true)
-                }else{
-                    chbestado.setChecked(false)
-                }
-
-            }
-        )
-
-        return raiz
+        return binding.root
     }
+
+    fun onClickListener(cat:Category,pos:Int){
+        fila=pos
+        binding.lblidcat.text=cat.idcat.toString()
+        binding.txtcat.setText(cat.name_cat.toString())
+        if (cat.state==1){
+            binding.chkStateCategory.setChecked(true)
+        }else{
+            binding.chkStateCategory.setChecked(false)
+        }
+
+    }
+    fun onClickDeleteChangued(pos:Int,cat:Category){
+        if (cat.state==1){
+            eliminarCategory(binding.root.context,cat.idcat.toLong())
+            DialogoCRUD("Categoria Deshabilitado","Se deshabilito el estado de la categoria "+cat.name_cat,CategoryFragment())
+        }else{
+            cat.state=1
+            actualizarCategory(binding.root.context,cat,cat.idcat.toLong())
+            DialogoCRUD("Categoria Habilitado","Se habilitó el estado de la categoria "+cat.name_cat,CategoryFragment())
+        }
+    }
+
 
     fun reporte():List<Category>{
         val call = categoryService!!.MostrarCategory()
@@ -220,7 +174,7 @@ class CategoryFragment : Fragment() {
                 response: Response<List<Category>?>
             ) {
                 if(response.isSuccessful){
-                    registroCategory = response.body()
+                    registroCategory = response.body() as MutableList<Category>?
                 }
             }
             override fun onFailure(call: Call<List<Category>?>, t: Throwable) {
@@ -240,8 +194,12 @@ class CategoryFragment : Fragment() {
                 response: Response<List<Category>?>
             ) {
                 if(response.isSuccessful){
-                    registroCategory = response.body()
-                    lstcat.adapter = AdaptadorCategory(contex,registroCategory)
+                    registroCategory = response.body() as MutableList<Category>?
+                    adapterCategory = AdaptadorCategory(lista=registroCategory!!,
+                        onClickListener={b,pos->onClickListener(b,pos)},
+                        onClickDeleteChangued={del,bra->onClickDeleteChangued(del,bra)})
+                    binding.lstcat.layoutManager=llmanager
+                    binding.lstcat.adapter=adapterCategory
                 }
             }
 
@@ -271,33 +229,34 @@ class CategoryFragment : Fragment() {
 
     fun actualizarCategory(context: Context,ca:Category,id:Long){
         val call = categoryService!!.ActualizarCategory(id,ca)
-        call!!.enqueue(object :Callback<List<Category>?>{
+        call!!.enqueue(object :Callback<Category>{
             override fun onResponse(
-                call: Call<List<Category>?>,
-                response: Response<List<Category>?>
+                call: Call<Category>?,
+                response: Response<Category>?
             ) {
-                if(response.isSuccessful){
+                if(response!!.isSuccessful){
                     Log.e("mensaje", "Se actualizo correctamente")
+                    fila=null
                 }
             }
 
-            override fun onFailure(call: Call<List<Category>?>, t: Throwable) {
+            override fun onFailure(call: Call<Category>?, t: Throwable) {
                 Log.e("Error: ", t.message!!)
             }
         })
     }
     fun eliminarCategory(context: Context,id:Long){
         val call = categoryService!!.EliminarCategory(id)
-        call!!.enqueue(object :Callback<List<Category>?>{
+        call!!.enqueue(object :Callback<Category>{
             override fun onResponse(
-                call: Call<List<Category>?>,
-                response: Response<List<Category>?>
+                call: Call<Category>?,
+                response: Response<Category>?
             ) {
-                if(response.isSuccessful){
+                if(response!!.isSuccessful){
                     Log.e("mensaje","Se elimino correctamente")
                 }
             }
-            override fun onFailure(call: Call<List<Category>?>, t: Throwable) {
+            override fun onFailure(call: Call<Category>?, t: Throwable) {
                 Log.e("Error: ",t.message!!)
             }
         })

@@ -13,8 +13,8 @@ interface StyleService {
     fun RegistrarEstilo(@Body b: Style): Call<Style>?
 
     @PUT("style/{idstyles}")
-    fun ActualizarEstilo(@Path("idstyles") id: Long, @Body b: Style): Call<List<Style>?>?
+    fun ActualizarEstilo(@Path("idstyles") id: Long, @Body b: Style): Call<Style>?
 
     @DELETE("style/{idstyles}")
-    fun EliminarEstilo(@Path("idstyles") id: Long ): Call<List<Style>?>?
+    fun EliminarEstilo(@Path("idstyles") id: Long ): Call<Style>?
 }

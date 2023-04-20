@@ -20,10 +20,10 @@ interface ProductService {
 
 
     @PUT("product/{idproduc}")
-    fun ActualizarProduct(@Path("idproduc") id: Long, @Body p:Product): Call<List<Product>?>?
+    fun ActualizarProduct(@Path("idproduc") id: Long, @Body p:Product): Call<Product>?
 
 
 
     @DELETE("product/{idproduc}")
-    fun EliminarProduct(@Path("idproduc") id:Long): Call<List<Product>?>?
+    fun EliminarProduct(@Path("idproduc") id:Long): Call<Product>?
 }

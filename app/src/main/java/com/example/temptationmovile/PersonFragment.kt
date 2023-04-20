@@ -18,6 +18,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.core.view.get
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.temptationmovile.adaptadores.AdaptadorComboRol
 import com.example.temptationmovile.adaptadores.AdaptadorPerson
 import com.example.temptationmovile.adaptadores.AdaptadorProduct
@@ -34,6 +35,7 @@ import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Date
 import at.favre.lib.crypto.bcrypt.BCrypt
+import com.example.temptationmovile.databinding.FragmentPersonBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -47,52 +49,22 @@ private const val ARG_PARAM2 = "param2"
  */
 class PersonFragment : Fragment() {
 
-    private lateinit var spinner_Rol:Spinner
-    private lateinit var txtNombre_person:EditText
-    private lateinit var txtApellidos_person:EditText
-    private lateinit var txtDateb_person:EditText
-    private lateinit var txtDni_person:EditText
-    private lateinit var rbtGroupSx:RadioGroup
-    private lateinit var rbtGenM:RadioButton
-    private lateinit var rbtGenF:RadioButton
-    private lateinit var txtDireccion_person:EditText
-    private lateinit var txtUsuario_person:EditText
-    private lateinit var chbestado_person:CheckBox
-    private lateinit var lblid_person:TextView
-    private lateinit var btnregistrar_person:Button
-    private lateinit var btnactualizar_person:Button
-    private lateinit var btneliminar_person:Button
-    private lateinit var lstPerson:ListView
-
+    private var _binding:FragmentPersonBinding?=null
+    private val binding get() = _binding!!
+    private lateinit var adaptadorPerson: AdaptadorPerson
+    private var llmanager:LinearLayoutManager?=null
 
     val format = SimpleDateFormat("yyyy-MM-dd") // crear el formato de fecha
-
-    private val objPerson=Person()
-    private val objRol=Rol()
-    private var idperson=0
-    private var idrol=Rol()
-    private var name = ""
-    private var lastname=""
-    private var date_b=Date()
-    private var dni=""
-    private var gender=""
-    private var address=""
-    private var username=""
-    private var password=""
-    private var state=0
-    private var key=""
-    private var fila=-1
-
+    private var fila:Int?=null
 
     private var personService:PersonService?=null
     private var rolService:RolService?=null
 
-    private var registroPerson:List<Person>?=null
+    private var registroPerson:MutableList<Person>?=null
     private var registroRol:List<Rol>?=null
 
-    private var indiceRol = 0
-
     var objutilidad =  Util()
+    var objPerson=Person()
 
     private var dialogo: AlertDialog.Builder? = null
     var ft: FragmentTransaction?= null
@@ -101,163 +73,108 @@ class PersonFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val raiz= inflater.inflate(R.layout.fragment_person, container, false)
-        lblid_person=raiz.findViewById(R.id.lblid_person)
-        spinner_Rol=raiz.findViewById(R.id.spinner_Rol)
-        txtNombre_person=raiz.findViewById(R.id.txtNombre_person)
-        txtApellidos_person=raiz.findViewById(R.id.txtApellidos_person)
-        txtDateb_person=raiz.findViewById(R.id.txtDateb_person)
-        txtDni_person=raiz.findViewById(R.id.txtDni_person)
-        rbtGroupSx=raiz.findViewById(R.id.rbtGroupSx)
-        rbtGenM=raiz.findViewById(R.id.rbtGenM)
-        rbtGenF=raiz.findViewById(R.id.rbtGenF)
-        txtDireccion_person=raiz.findViewById(R.id.txtDireccion_person)
-        txtUsuario_person=raiz.findViewById(R.id.txtUsuario_person)
-        chbestado_person=raiz.findViewById(R.id.chbestado_person)
-        btnregistrar_person=raiz.findViewById(R.id.btnregistrar_person)
-        btnactualizar_person=raiz.findViewById(R.id.btnactualizar_person)
-        btneliminar_person=raiz.findViewById(R.id.btneliminar_person)
-        lstPerson=raiz.findViewById(R.id.lstPerson)
-        lstPerson.isNestedScrollingEnabled = true
+        _binding= FragmentPersonBinding.inflate(inflater, container, false)
+        var context=binding.root.context
+        llmanager=LinearLayoutManager(context)
 
         registroPerson=ArrayList()
         registroRol=ArrayList()
         rolService=ApiUtil.rolService
         personService=ApiUtil.personService
-        mostrarUsers(raiz.context)
-        mostrarComboRol(raiz.context)
-        btnregistrar_person.setOnClickListener{
-            if (spinner_Rol.selectedItemPosition==-1){
-                objutilidad.MensajeToast(raiz.context,"Seleccione el Rol")
-                spinner_Rol.requestFocus()
-            }else if (txtNombre_person.text.toString()==""){
-                objutilidad.MensajeToast(raiz.context,"Ingrese el Nombre")
-                txtNombre_person.requestFocus()
-            }else if (txtApellidos_person.text.toString()==""){
-                objutilidad.MensajeToast(raiz.context,"Ingrese el Apellido")
-                txtApellidos_person.requestFocus()
-            }else if (txtDateb_person.text.toString()==""){
-                objutilidad.MensajeToast(raiz.context,"Ingrese Fecha de Nacimiento")
-                txtDateb_person.requestFocus()
-            }else if (txtDni_person.text.toString()==""){
-                objutilidad.MensajeToast(raiz.context,"Ingrese el DNI")
-                txtDni_person.requestFocus()
-            }else if (txtUsuario_person.text.toString()==""){
-                objutilidad.MensajeToast(raiz.context,"Ingrese el Usuario")
-                txtUsuario_person.requestFocus()
-            }else if (txtDireccion_person.text.toString()==""){
-                objutilidad.MensajeToast(raiz.context,"Ingrese la dirección")
-                txtDireccion_person.requestFocus()
-            }else if (!!rbtGenF.isChecked and rbtGenM.isChecked){
-                objutilidad.MensajeToast(raiz.context,"Seleccione su genero")
-                rbtGroupSx.requestFocus()
+        mostrarUsers(context)
+        mostrarComboRol(context)
+        binding.btnregistrarPerson.setOnClickListener{
+            if (binding.spinnerRol.selectedItemPosition==-1){
+                objutilidad.MensajeToast(context,"Seleccione el Rol")
+                binding.spinnerRol.requestFocus()
+            }else if (binding.txtNombrePerson.text.toString()==""){
+                objutilidad.MensajeToast(context,"Ingrese el Nombre")
+                binding.txtNombrePerson.requestFocus()
+            }else if (binding.txtApellidosPerson.text.toString()==""){
+                objutilidad.MensajeToast(context,"Ingrese el Apellido")
+                binding.txtApellidosPerson.requestFocus()
+            }else if (binding.txtDatebPerson.text.toString()==""){
+                objutilidad.MensajeToast(context,"Ingrese Fecha de Nacimiento")
+                binding.txtDatebPerson.requestFocus()
+            }else if (binding.txtDniPerson.text.toString()==""){
+                objutilidad.MensajeToast(context,"Ingrese el DNI")
+                binding.txtDniPerson.requestFocus()
+            }else if (binding.txtUsuarioPerson.text.toString()==""){
+                objutilidad.MensajeToast(context,"Ingrese el Usuario")
+                binding.txtUsuarioPerson.requestFocus()
+            }else if (binding.txtDireccionPerson.text.toString()==""){
+                objutilidad.MensajeToast(context,"Ingrese la dirección")
+                binding.txtDireccionPerson.requestFocus()
+            }else if (!!binding.rbtGenF.isChecked and binding.rbtGenM.isChecked){
+                objutilidad.MensajeToast(context,"Seleccione su genero")
+                binding.rbtGroupSx.requestFocus()
             }else{
-                objPerson.name=txtNombre_person.text.toString()
-                objPerson.lastname=txtApellidos_person.text.toString()
+                objPerson.name=binding.txtNombrePerson.text.toString()
+                objPerson.lastname=binding.txtApellidosPerson.text.toString()
                 val modfecha=SimpleDateFormat("yyyy-MM-dd")
-                println("Fecha  "+modfecha.format(format.parse(txtDateb_person.text.toString())))
-                objPerson.date_b= modfecha.format(format.parse(txtDateb_person.text.toString()))// analizar la fecha y convertirla en un objeto DatetxtDateb_person.text.
-                objPerson.gender=if (rbtGenM.isChecked)"M" else "F"
-                objPerson.username=txtUsuario_person.text.toString()
-                objPerson.password=txtUsuario_person.text.toString()
-                objPerson.address=txtDireccion_person.text.toString()
-                objPerson.state=if (chbestado_person.isChecked) 1 else 0
-                println("Rol : "+spinner_Rol.selectedItemPosition)
-                objPerson.idrol=(registroRol as ArrayList<Rol>).get(spinner_Rol.selectedItemPosition).idrol
-                objPerson.dni=txtDni_person.text.toString()
-                registrarUsuario(raiz.context,objPerson)
+                println("Fecha  "+modfecha.format(format.parse(binding.txtDatebPerson.text.toString())))
+                objPerson.date_b= modfecha.format(format.parse(binding.txtDatebPerson.text.toString()))// analizar la fecha y convertirla en un objeto DatetxtDateb_person.text.
+                objPerson.gender=if (binding.rbtGenM.isChecked)"M" else "F"
+                objPerson.username=binding.txtUsuarioPerson.text.toString()
+                objPerson.password=binding.txtUsuarioPerson.text.toString()
+                objPerson.address=binding.txtDireccionPerson.text.toString()
+                objPerson.state=if (binding.chbestadoPerson.isChecked) 1 else 0
+                objPerson.idrol=(registroRol as ArrayList<Rol>).get(binding.spinnerRol.selectedItemPosition).idrol
+                objPerson.dni=binding.txtDniPerson.text.toString()
+                registrarUsuario(context,objPerson)
                 DialogoCRUD("Registro de Usuario","Se registro el usuario",PersonFragment())
             }
         }
 
-        btnactualizar_person.setOnClickListener{
-            if(fila >=0) {
-                if (spinner_Rol.selectedItemPosition == -1) {
-                    objutilidad.MensajeToast(raiz.context, "Seleccione el Rol")
-                    spinner_Rol.requestFocus()
-                } else if (txtNombre_person.text.toString() == "") {
-                    objutilidad.MensajeToast(raiz.context, "Ingrese el Nombre")
-                    txtNombre_person.requestFocus()
-                } else if (txtApellidos_person.text.toString() == "") {
-                    objutilidad.MensajeToast(raiz.context, "Ingrese el Apellido")
-                    txtApellidos_person.requestFocus()
-                } else if (txtDateb_person.text.toString() == "") {
-                    objutilidad.MensajeToast(raiz.context, "Ingrese Fecha de Nacimiento")
-                    txtDateb_person.requestFocus()
-                } else if (txtDni_person.text.toString() == "") {
-                    objutilidad.MensajeToast(raiz.context, "Ingrese el DNI")
-                    txtDni_person.requestFocus()
-                } else if (txtUsuario_person.text.toString() == "") {
-                    objutilidad.MensajeToast(raiz.context, "Ingrese el Usuario")
-                    txtUsuario_person.requestFocus()
-                } else if (txtDireccion_person.text.toString() == "") {
-                    objutilidad.MensajeToast(raiz.context, "Ingrese la dirección")
-                    txtDireccion_person.requestFocus()
-                }else if (!!rbtGenF.isChecked and rbtGenM.isChecked) {
-                    objutilidad.MensajeToast(raiz.context, "Seleccione su genero")
-                    rbtGroupSx.requestFocus()
-                } else {
-                    objPerson.name = txtNombre_person.text.toString()
-                    objPerson.lastname = txtApellidos_person.text.toString()
-                    val modfecha = SimpleDateFormat("yyyy-MM-dd")
-                    println("Fecha  " + modfecha.format(format.parse(txtDateb_person.text.toString())))
-                    objPerson.date_b =
-                        modfecha.format(format.parse(txtDateb_person.text.toString()))// analizar la fecha y convertirla en un objeto DatetxtDateb_person.text.
-                    idperson=lblid_person.text.toString().toInt()
-                    objPerson.gender=if (rbtGenM.isChecked)"M" else "F"
-                    objPerson.username = txtUsuario_person.text.toString()
-                    objPerson.password = txtUsuario_person.text.toString()
-                    objPerson.address = txtDireccion_person.text.toString()
-                    objPerson.state = if (chbestado_person.isChecked()) 1 else 0
-                    println("Rol : " + spinner_Rol.selectedItemPosition)
-                    objPerson.idrol = (registroRol as ArrayList<Rol>).get(spinner_Rol.selectedItemPosition).idrol
-                    objPerson.dni = txtDni_person.text.toString()
-                    objPerson.key=""
-                    ActualizarUsuario(raiz.context, objPerson,idperson.toLong())
+        binding.btnactualizarPerson.setOnClickListener{
+            if(fila !=null) {
+                if (binding.spinnerRol.selectedItemPosition==-1){
+                    objutilidad.MensajeToast(context,"Seleccione el Rol")
+                    binding.spinnerRol.requestFocus()
+                }else if (binding.txtNombrePerson.text.toString()==""){
+                    objutilidad.MensajeToast(context,"Ingrese el Nombre")
+                    binding.txtNombrePerson.requestFocus()
+                }else if (binding.txtApellidosPerson.text.toString()==""){
+                    objutilidad.MensajeToast(context,"Ingrese el Apellido")
+                    binding.txtApellidosPerson.requestFocus()
+                }else if (binding.txtDatebPerson.text.toString()==""){
+                    objutilidad.MensajeToast(context,"Ingrese Fecha de Nacimiento")
+                    binding.txtDatebPerson.requestFocus()
+                }else if (binding.txtDniPerson.text.toString()==""){
+                    objutilidad.MensajeToast(context,"Ingrese el DNI")
+                    binding.txtDniPerson.requestFocus()
+                }else if (binding.txtUsuarioPerson.text.toString()==""){
+                    objutilidad.MensajeToast(context,"Ingrese el Usuario")
+                    binding.txtUsuarioPerson.requestFocus()
+                }else if (binding.txtDireccionPerson.text.toString()==""){
+                    objutilidad.MensajeToast(context,"Ingrese la dirección")
+                    binding.txtDireccionPerson.requestFocus()
+                }else if (!!binding.rbtGenF.isChecked and binding.rbtGenM.isChecked){
+                    objutilidad.MensajeToast(context,"Seleccione su genero")
+                    binding.rbtGroupSx.requestFocus()
+                }else{
+                    objPerson.name=binding.txtNombrePerson.text.toString()
+                    objPerson.lastname=binding.txtApellidosPerson.text.toString()
+                    val modfecha=SimpleDateFormat("yyyy-MM-dd")
+                    println("Fecha  "+modfecha.format(format.parse(binding.txtDatebPerson.text.toString())))
+                    objPerson.date_b= modfecha.format(format.parse(binding.txtDatebPerson.text.toString()))// analizar la fecha y convertirla en un objeto DatetxtDateb_person.text.
+                    objPerson.gender=if (binding.rbtGenM.isChecked)"M" else "F"
+                    objPerson.username=binding.txtUsuarioPerson.text.toString()
+                    objPerson.password=binding.txtUsuarioPerson.text.toString()
+                    objPerson.address=binding.txtDireccionPerson.text.toString()
+                    objPerson.state=if (binding.chbestadoPerson.isChecked) 1 else 0
+                    objPerson.idrol=(registroRol as ArrayList<Rol>).get(binding.spinnerRol.selectedItemPosition).idrol
+                    objPerson.dni=binding.txtDniPerson.text.toString()
+                    objPerson.idperson=binding.lblidPerson.text.toString().toInt()
+                    ActualizarUsuario(context, objPerson,objPerson.idperson.toLong())
                     DialogoCRUD("Actualización de Usuario", "Se actualizo el usuario", PersonFragment())
                 }
             }else{
-                objutilidad.MensajeToast(raiz.context,"Seleccione un elemento de la lista")
-                lstPerson.requestFocus()
+                objutilidad.MensajeToast(context,"Seleccione un elemento de la lista")
+                binding.lstPerson.requestFocus()
             }
         }
-
-        btneliminar_person.setOnClickListener {
-            if (fila>=0){
-                objPerson.idperson=lblid_person.text.toString().toInt()
-                EliminarUsuario(raiz.context,objPerson.idperson.toLong())
-                DialogoCRUD("Usuario eliminado","se elimino al usuario",PersonFragment())
-            }else{
-                objutilidad.MensajeToast(raiz.context,"Seleccione un elemento de la lista")
-                lstPerson.requestFocus()
-            }
-        }
-
-        lstPerson.setOnItemClickListener { adapterView, view, i, l ->
-            fila = i
-            lblid_person.text = (registroPerson as ArrayList<Person>).get(fila).idperson.toString()
-            txtNombre_person.setText(""+(registroPerson as ArrayList<Person>).get(fila).name)
-            txtApellidos_person.setText(""+(registroPerson as ArrayList<Person>).get(fila).lastname)
-            txtDateb_person.setText(""+(registroPerson as ArrayList<Person>).get(fila).date_b)
-            txtDni_person.setText(""+(registroPerson as ArrayList<Person>).get(fila).dni)
-            var sx=(registroPerson as ArrayList<Person>).get(fila).gender.toString().trim()
-            if (sx=="M"){
-                rbtGenM.isChecked=true
-            }else if (sx=="F"){
-                rbtGenF.isChecked=true
-            }
-            txtDireccion_person.setText(""+(registroPerson as ArrayList<Person>).get(fila).address)
-            txtUsuario_person.setText(""+(registroPerson as ArrayList<Person>).get(fila).username)
-            if(((registroPerson as ArrayList<Person>).get(fila).state)==1)chbestado_person.isChecked=true else chbestado_person.isChecked=false
-            for ( x in (registroRol as ArrayList<Rol>).indices){
-                if ((registroRol as ArrayList<Rol>).get(x).idrol==(registroPerson as ArrayList<Person>).get(fila).idrol){
-                    indiceRol=x
-                }
-            }
-            spinner_Rol.setSelection(indiceRol)
-        }
-
-        return raiz
+        return binding.root
     }
 
     fun mostrarComboRol(context: Context){
@@ -266,7 +183,7 @@ class PersonFragment : Fragment() {
             override fun onResponse(call: Call<List<Rol>?>, response: Response<List<Rol>?>) {
                 if(response.isSuccessful){
                     registroRol=response.body()
-                    spinner_Rol.adapter=AdaptadorComboRol(context,registroRol)
+                    binding.spinnerRol.adapter=AdaptadorComboRol(context,registroRol)
                 }
             }
 
@@ -275,24 +192,54 @@ class PersonFragment : Fragment() {
             }
         })
     }
-
+    fun onClickListener(person:Person,pos:Int){
+        fila=pos
+        binding.txtApellidosPerson.setText(person.lastname.toString())
+        binding.txtDatebPerson.setText(person.date_b.toString())
+        binding.txtNombrePerson.setText(person.name.toString())
+        binding.lblidPerson.setText(person.idperson.toString())
+        binding.txtDniPerson.setText(person.dni.toString())
+        binding.txtDireccionPerson.setText(person.address.toString())
+        binding.txtUsuarioPerson.setText(person.username.toString())
+        if (person.gender.toString()=="M"){
+            binding.rbtGenM.isChecked=true
+        }else{
+            binding.rbtGenF.isChecked=true
+        }
+        if(person.state==1)binding.chbestadoPerson.isChecked=true else binding.chbestadoPerson.isChecked=false
+        for ( x in (registroRol as ArrayList<Rol>).indices){
+            if ((registroRol as ArrayList<Rol>).get(x).idrol==person.idrol){
+                binding.spinnerRol.setSelection(x)
+            }
+        }
+    }
+    fun onClickDeleteChangued(del:Int,person:Person){
+        if (person.state==1){
+            EliminarUsuario(binding.root.context,person.idperson.toLong())
+            DialogoCRUD("Usuario Deshabilitado","Se deshabilito el estado del Usuario "+person.name,PersonFragment())
+        }else{
+            person.state=1
+            ActualizarUsuario(binding.root.context,person,person.idperson.toLong())
+            DialogoCRUD("Usuario Habilitado","Se habilitó el estado del Usuario "+person.name,PersonFragment())
+        }
+    }
     fun mostrarUsers(context: Context){
         val call = personService!!.MostrarUsuarios()
         call!!.enqueue(object : Callback<List<Person>> {
             override fun onResponse(call: Call<List<Person>>, response: Response<List<Person>>) {
                 if(response.isSuccessful){
                     println("Correcto")
-                    registroPerson = response.body()
-                    lstPerson.adapter = AdaptadorPerson(context,registroPerson)
+                    registroPerson = response.body() as MutableList<Person>
+                    adaptadorPerson = AdaptadorPerson(lista=registroPerson!!,
+                        onClickListener={person,pos->onClickListener(person,pos)},
+                        onClickDeleteChangued={del,person->onClickDeleteChangued(del,person)})
                 }else{
                     println("Error")
                 }
             }
-
             override fun onFailure(call: Call<List<Person>>, t: Throwable) {
                 Log.e("Error: ", t.message.toString())
             }
-
         })
     }
 
@@ -313,13 +260,14 @@ class PersonFragment : Fragment() {
     }
     fun ActualizarUsuario(context: Context, p: Person, id: Long ){
         val call = personService!!.ActualizarUsuario(id,p)
-        call!!.enqueue(object : Callback<List<Person>?> {
-            override fun onResponse(call: Call<List<Person>?>, response: Response<List<Person>?>) {
+        call!!.enqueue(object : Callback<Person?> {
+            override fun onResponse(call: Call<Person?>, response: Response<Person?>) {
                 if(response.isSuccessful){
                     Log.e("Mensaje", "Se actualizo correctamente el Usuario")
+                    fila=null
                 }
             }
-            override fun onFailure(call: Call<List<Person>?>, t: Throwable) {
+            override fun onFailure(call: Call<Person?>, t: Throwable) {
                 Log.e("Error: ",t.message!!)
             }
         })
@@ -327,13 +275,13 @@ class PersonFragment : Fragment() {
 
     fun EliminarUsuario(context: Context, id: Long){
         val call = personService!!.EliminarUsuario(id)
-        call!!.enqueue(object: Callback<List<Person>?> {
-            override fun onResponse(call: Call<List<Person>?>, response: Response<List<Person>?>) {
+        call!!.enqueue(object: Callback<Person?> {
+            override fun onResponse(call: Call<Person?>, response: Response<Person?>) {
                 if(response.isSuccessful){
                     Log.e("mensaje","Se elimino correctamente")
                 }
             }
-            override fun onFailure(call: Call<List<Person>?>, t: Throwable) {
+            override fun onFailure(call: Call<Person?>, t: Throwable) {
                 Log.e("Error",t.message!!)
             }
         })
@@ -353,5 +301,4 @@ class PersonFragment : Fragment() {
         }
         dialogo!!.show()
     }
-
 }

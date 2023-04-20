@@ -21,10 +21,10 @@ interface PersonService {
     fun RegistrarUsuario(@Body p:Person):Call<Person>
 
     @PUT("person/{idperson}")
-    fun ActualizarUsuario(@Path("idperson") idperson:Long,@Body p:Person):Call<List<Person>?>?
+    fun ActualizarUsuario(@Path("idperson") idperson:Long,@Body p:Person):Call<Person>?
 
     @DELETE("person/{idperson}")
-    fun EliminarUsuario(@Path("idperson")idperson:Long):Call<List<Person>?>?
+    fun EliminarUsuario(@Path("idperson")idperson:Long):Call<Person>?
 
 
 }
